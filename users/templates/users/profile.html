@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}Mon Profil | LUXE.{% endblock %}
+
+{% block content %}
+<div class="bg-brand-50 min-h-screen py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-extrabold text-brand-900 uppercase tracking-tight">Mon Espace</h1>
+            <form action="{% url 'users:logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="text-sm font-bold text-gray-500 hover:text-red-600 uppercase tracking-wider transition">Déconnexion</button>
+            </form>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Profile Details -->
+            <div class="bg-white p-6 shadow-sm col-span-1 h-fit">
+                <h2 class="text-lg font-bold text-brand-900 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Mes Informations</h2>
+                <div class="space-y-4 text-sm text-gray-600">
+                    <p><strong class="text-brand-900">Nom:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+                    <p><strong class="text-brand-900">Email:</strong> {{ user.email }}</p>
+                    <p><strong class="text-brand-900">Téléphone:</strong> {{ user.phone_number }}</p>
+                </div>
+            </div>
+
+            <!-- Addresses & Orders -->
+            <div class="col-span-1 md:col-span-2 space-y-8">
+                <!-- Addresses -->
+                <div class="bg-white p-6 shadow-sm">
+                    <h2 class="text-lg font-bold text-brand-900 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Mes Adresses</h2>
+                    {% if addresses %}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                            {% for address in addresses %}
+                                <div class="border border-gray-200 p-4 {% if address.is_default %}border-brand-900 bg-gray-50{% endif %}">
+                                    <p class="font-bold text-brand-900 uppercase text-xs mb-2">{% if address.is_default %}Adresse par défaut{% else %}Adresse secondaire{% endif %}</p>
+                                    <p class="text-sm text-gray-600">{{ address.street }}</p>
+                                    <p class="text-sm text-gray-600">{{ address.postal_code }} {{ address.city }}</p>
+                                    <p class="text-sm text-gray-600">{{ address.country }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-sm text-gray-500 mb-6">Vous n'avez pas encore d'adresse enregistrée.</p>
+                    {% endif %}
+                    
+                    <h3 class="text-sm font-bold text-brand-900 uppercase mb-3">Ajouter une nouvelle adresse</h3>
+                    <form method="post" class="space-y-4">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {% for field in address_form %}
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">{{ field.label }}</label>
+                                    {{ field }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button type="submit" class="bg-brand-900 text-white text-xs font-bold uppercase tracking-widest py-2 px-6 hover:bg-black transition">Ajouter l'adresse</button>
+                    </form>
+                </div>
+
+                <!-- Orders -->
+                <div class="bg-white p-6 shadow-sm">
+                    <h2 class="text-lg font-bold text-brand-900 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Mes Commandes</h2>
+                    {% if user.orders.all %}
+                        <div class="space-y-4">
+                            {% for order in user.orders.all %}
+                            <div class="border border-gray-200 p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <p class="font-bold text-brand-900 uppercase text-xs">Commande #{{ order.id }}</p>
+                                        <p class="text-xs text-gray-500">{{ order.created_at|date:"d M Y" }}</p>
+                                    </div>
+                                    <span class="inline-block px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-800">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </div>
+                                <p class="text-sm font-bold text-brand-900 mb-2">{{ order.total_amount }} MAD</p>
+                                <div class="text-xs text-gray-600">
+                                    {% for item in order.items.all %}
+                                        <p>- {{ item.quantity }}x {{ item.variant.product.name }} ({{ item.variant.size }} / {{ item.variant.color }})</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-sm text-gray-500">Aucune commande récente.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

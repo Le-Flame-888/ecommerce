@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes Favoris | LUXE.{% endblock %}
+
+{% block content %}
+<div class="bg-brand-50 min-h-[70vh] py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-extrabold text-brand-900 uppercase tracking-tight mb-8">Mes Favoris</h1>
+        
+        {% if products %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {% for product in products %}
+            <div class="group cursor-pointer">
+                <a href="{% url 'products:product_detail' product.slug %}">
+                    <div class="relative bg-white overflow-hidden aspect-[4/5] mb-4">
+                        {% if product.images.first %}
+                        <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500 ease-in-out">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center bg-gray-200">
+                            <span class="text-gray-400 uppercase text-xs font-bold tracking-widest">Image indisponible</span>
+                        </div>
+                        {% endif %}
+                        <div class="absolute top-2 right-2 z-10">
+                            <form action="{% url 'users:toggle_wishlist' product.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="bg-white p-2 rounded-full shadow-md text-red-500 hover:scale-110 transition">
+                                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-sm font-bold uppercase text-brand-900 mb-1">{{ product.name }}</h3>
+                            <p class="text-xs text-gray-500 uppercase">{{ product.category.name }}</p>
+                        </div>
+                        <span class="text-sm font-bold text-brand-900">{{ product.base_price }} MAD</span>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white p-12 text-center shadow-sm">
+            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+            <p class="text-gray-500 mb-6 uppercase tracking-widest text-sm font-bold">Votre liste de favoris est vide.</p>
+            <a href="{% url 'products:product_list' %}" class="inline-block bg-brand-900 text-white font-bold uppercase tracking-widest py-3 px-8 hover:bg-black transition text-sm">
+                Découvrir la boutique
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

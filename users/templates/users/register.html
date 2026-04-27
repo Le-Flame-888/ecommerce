@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}Créer un compte | LUXE.{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-brand-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-xl w-full bg-white p-8 shadow-sm">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-extrabold text-brand-900 uppercase tracking-tight">Inscription</h2>
+            <p class="mt-2 text-sm text-gray-500">Rejoignez-nous et découvrez l'élégance.</p>
+        </div>
+        
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 uppercase tracking-wider mb-1">{{ field.label }}</label>
+                    <div class="mt-1">
+                        {% render_field field class="w-full border border-gray-300 px-4 py-2 text-sm rounded-none focus:outline-none focus:ring-1 focus:ring-brand-900 focus:border-brand-900" %}
+                    </div>
+                    {% if field.errors %}
+                        <p class="text-red-500 text-xs italic mt-1">{{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="pt-4">
+                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold uppercase tracking-widest text-white bg-brand-900 hover:bg-black transition">
+                    Créer mon compte
+                </button>
+            </div>
+        </form>
+        
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-500">Vous avez déjà un compte ? <a href="{% url 'users:login' %}" class="font-bold text-brand-900 hover:underline">Connectez-vous</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

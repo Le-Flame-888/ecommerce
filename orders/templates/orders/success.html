@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Commande Confirmée | LUXE.{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex flex-col items-center justify-center bg-brand-50 py-16 px-4 text-center">
+    <div class="bg-white p-12 shadow-sm max-w-2xl w-full">
+        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        
+        <h1 class="text-4xl font-extrabold text-brand-900 uppercase tracking-tight mb-4">Merci pour votre commande !</h1>
+        <p class="text-lg text-gray-500 mb-8 font-light">Votre commande <strong class="text-brand-900">#{{ order.id }}</strong> a été confirmée avec succès. Un e-mail de confirmation vous a été envoyé.</p>
+        
+        <div class="bg-gray-50 p-6 border border-gray-200 mb-8 text-left">
+            <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider mb-2">Détails de la livraison</h3>
+            <p class="text-sm text-gray-600">{{ order.first_name }} {{ order.last_name }}</p>
+            <p class="text-sm text-gray-600">{{ order.street }}</p>
+            <p class="text-sm text-gray-600">{{ order.postal_code }} {{ order.city }}</p>
+            <p class="text-sm text-gray-600 mt-4"><strong class="uppercase text-brand-900">Méthode de paiement:</strong> À la livraison</p>
+            <p class="text-sm text-gray-600"><strong class="uppercase text-brand-900">Total à payer:</strong> {{ order.total_amount }} MAD</p>
+        </div>
+
+        <a href="{% url 'products:product_list' %}" class="inline-block bg-brand-900 text-white font-bold uppercase tracking-widest py-4 px-10 hover:bg-black transition duration-300">
+            Retour à la boutique
+        </a>
+    </div>
+</div>
+{% endblock %}

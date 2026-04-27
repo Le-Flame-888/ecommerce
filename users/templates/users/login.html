@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Connexion | LUXE.{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-brand-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full bg-white p-8 shadow-sm">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-extrabold text-brand-900 uppercase tracking-tight">Connexion</h2>
+            <p class="mt-2 text-sm text-gray-500">Accédez à votre compte premium.</p>
+        </div>
+        
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            {% if form.errors %}
+                <div class="bg-red-50 text-red-500 p-3 text-sm font-semibold border border-red-200">
+                    Identifiant ou mot de passe incorrect.
+                </div>
+            {% endif %}
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="id_username" class="sr-only">Nom d'utilisateur</label>
+                    <input id="id_username" name="username" type="text" required class="w-full border border-gray-300 px-4 py-2 text-sm rounded-none focus:outline-none focus:ring-1 focus:ring-brand-900 focus:border-brand-900" placeholder="Nom d'utilisateur">
+                </div>
+                <div>
+                    <label for="id_password" class="sr-only">Mot de passe</label>
+                    <input id="id_password" name="password" type="password" required class="w-full border border-gray-300 px-4 py-2 text-sm rounded-none focus:outline-none focus:ring-1 focus:ring-brand-900 focus:border-brand-900" placeholder="Mot de passe">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div class="text-sm">
+                    <a href="#" class="font-medium text-gray-500 hover:text-brand-900">Mot de passe oublié ?</a>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold uppercase tracking-widest text-white bg-brand-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-900 transition">
+                    Se connecter
+                </button>
+            </div>
+        </form>
+        
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-500">Nouveau chez LUXE. ? <a href="{% url 'users:register' %}" class="font-bold text-brand-900 hover:underline">Créer un compte</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

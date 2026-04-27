@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Caisse | LUXE.{% endblock %}
+
+{% block content %}
+<div class="bg-brand-50 min-h-screen py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-extrabold text-brand-900 uppercase tracking-tight mb-8">Paiement Sécurisé</h1>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Checkout Form -->
+            <div class="flex-grow bg-white p-8 shadow-sm">
+                <h2 class="text-lg font-bold text-brand-900 uppercase tracking-wider mb-6 border-b border-gray-200 pb-2">Informations de livraison</h2>
+                
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Prénom</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Nom</label>
+                            {{ form.last_name }}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Email</label>
+                            {{ form.email }}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Téléphone</label>
+                            {{ form.phone }}
+                        </div>
+                    </div>
+
+                    <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider mt-8 mb-4">Adresse</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Rue</label>
+                            {{ form.street }}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Code Postal</label>
+                            {{ form.postal_code }}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Ville</label>
+                            {{ form.city }}
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Pays</label>
+                            {{ form.country }}
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-8 border-t border-gray-200">
+                        <h3 class="text-lg font-bold text-brand-900 uppercase tracking-wider mb-4">Méthode de paiement</h3>
+                        <div class="bg-gray-50 border border-gray-200 p-4 flex items-center">
+                            <input id="payment_cod" type="radio" checked class="h-4 w-4 text-brand-900 focus:ring-brand-900 border-gray-300">
+                            <label for="payment_cod" class="ml-3 block text-sm font-medium text-brand-900 uppercase">
+                                Paiement à la livraison (Cash on Delivery)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <button type="submit" class="w-full bg-brand-900 text-white font-bold uppercase tracking-widest py-4 hover:bg-black transition duration-300">
+                            Confirmer la commande
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="w-full lg:w-96 bg-gray-50 p-6 shadow-sm border border-gray-200 h-fit">
+                <h2 class="text-lg font-bold text-brand-900 uppercase tracking-wider mb-6 border-b border-gray-200 pb-4">Résumé</h2>
+                
+                <ul class="divide-y divide-gray-200 mb-6">
+                    {% for item in cart %}
+                    <li class="py-4 flex">
+                        <div class="flex-1">
+                            <p class="text-sm font-bold text-brand-900 uppercase">{{ item.variant.product.name }}</p>
+                            <p class="text-xs text-gray-500 uppercase">{{ item.variant.size }} | Qté: {{ item.quantity }}</p>
+                        </div>
+                        <p class="text-sm font-bold text-brand-900">{{ item.total_price }} MAD</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="border-t border-gray-200 pt-4 mb-4">
+                    <div class="flex justify-between text-sm text-gray-500 mb-2">
+                        <span>Sous-total</span>
+                        <span>{{ cart.get_total_price }} MAD</span>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-500">
+                        <span>Livraison</span>
+                        <span class="text-green-600 uppercase font-semibold">Gratuite</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center border-t border-gray-200 pt-4">
+                    <span class="text-base font-bold text-brand-900 uppercase">Total à payer</span>
+                    <span class="text-xl font-bold text-brand-900">{{ cart.get_total_price }} MAD</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

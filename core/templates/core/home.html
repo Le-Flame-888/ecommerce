@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}LUXE. | E-Commerce Premium{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative h-[80vh] flex items-center justify-center overflow-hidden">
+    <div class="absolute inset-0 z-0">
+        <img src="{% static 'images/hero.png' %}" alt="Hero Image" class="w-full h-full object-cover object-center filter brightness-75">
+    </div>
+    <div class="relative z-10 text-center px-4">
+        <h1 class="text-5xl md:text-7xl font-extrabold text-white uppercase tracking-tighter mb-6 drop-shadow-lg">
+            Nouvelle Collection
+        </h1>
+        <p class="text-lg md:text-2xl text-gray-200 mb-10 font-light max-w-2xl mx-auto drop-shadow-md">
+            L'essence du luxe moderne. Minimalisme, qualité et design intemporel.
+        </p>
+        <a href="/products/" class="inline-block bg-white text-brand-900 font-bold uppercase tracking-widest py-4 px-10 hover:bg-gray-100 transition duration-300 transform hover:-translate-y-1 shadow-xl">
+            Découvrir
+        </a>
+    </div>
+</section>
+
+<!-- Featured Categories / Text -->
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-extrabold text-brand-900 uppercase tracking-wide mb-6">Le Style Sans Compromis</h2>
+        <div class="w-24 h-1 bg-brand-900 mx-auto mb-10"></div>
+        <p class="text-gray-500 max-w-3xl mx-auto leading-relaxed">
+            Notre dernière collection redéfinit les standards du streetwear haut de gamme. Chaque pièce est conçue avec une attention méticuleuse aux détails, utilisant les matériaux les plus fins pour une durabilité et un confort inégalés.
+        </p>
+    </div>
+</section>
+
+<!-- Featured Products Demo (Static placeholders for now before views are fully connected) -->
+<section class="py-16 bg-brand-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-end mb-12">
+            <h2 class="text-3xl font-extrabold text-brand-900 uppercase tracking-tight">Tendances Actuelles</h2>
+            <a href="/products/" class="text-sm font-bold uppercase tracking-wider text-brand-900 hover:text-gray-500 transition border-b-2 border-brand-900 hover:border-gray-500 pb-1">Voir tout</a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {% for product in featured_products %}
+            <div class="group relative">
+                <a href="{% url 'products:product_detail' product.slug %}" class="block">
+                    <div class="relative bg-white overflow-hidden aspect-[4/5] mb-4">
+                        {% if product.images.first %}
+                        <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500 ease-in-out">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center bg-gray-200">
+                            <span class="text-gray-400 uppercase text-xs font-bold tracking-widest">Image indisponible</span>
+                        </div>
+                        {% endif %}
+                        <div class="absolute inset-x-0 bottom-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-black/50 to-transparent">
+                            <span class="block w-full bg-white text-center text-brand-900 font-bold uppercase py-3 text-sm tracking-widest hover:bg-gray-100 transition">Voir le produit</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <!-- Wishlist Heart Overlay -->
+                <div class="absolute top-2 right-2 z-10">
+                    {% if user.is_authenticated %}
+                        <form action="{% url 'users:toggle_wishlist' product.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-sm text-gray-400 hover:text-red-500 hover:scale-110 transition {% if product in user.wishlist.all %}text-red-500 fill-current{% endif %}">
+                                <svg class="w-4 h-4 {% if product in user.wishlist.all %}fill-current{% else %}fill-none{% endif %}" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'users:login' %}?next={{ request.path }}" class="block bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-sm text-gray-400 hover:text-red-500 hover:scale-110 transition">
+                            <svg class="w-4 h-4 fill-none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        </a>
+                    {% endif %}
+                </div>
+
+                <a href="{% url 'products:product_detail' product.slug %}" class="block mt-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-sm font-bold uppercase text-brand-900 mb-1">{{ product.name }}</h3>
+                            <p class="text-xs text-gray-500 uppercase">{{ product.category.name|default:"Tendance" }}</p>
+                        </div>
+                        <span class="text-sm font-bold text-brand-900">{{ product.base_price }} MAD</span>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-10">
+                <p class="text-gray-500 uppercase tracking-widest">Les nouveaux produits arrivent bientôt.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock content %}

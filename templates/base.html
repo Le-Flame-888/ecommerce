@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}E-Commerce Premium{% endblock %}</title>
+    <!-- Tailwind CSS (CDN for EFM simplicity) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f9fafb',
+                            100: '#f3f4f6',
+                            900: '#111827',
+                            black: '#000000',
+                            white: '#ffffff',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Base styles for standard Django form inputs */
+        input[type="text"], input[type="email"], input[type="password"], input[type="tel"] {
+            border-width: 1px !important;
+            border-color: #d1d5db !important;
+            padding: 0.5rem 0.75rem !important;
+            width: 100%;
+            outline: none;
+            border-radius: 0 !important;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="tel"]:focus {
+            border-color: #000 !important;
+            box-shadow: 0 0 0 1px #000 !important;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .nav-link { position: relative; transition: color 0.3s ease; }
+        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -4px; left: 0; background-color: #000; transition: width 0.3s ease; }
+        .nav-link:hover::after { width: 100%; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-brand-50 text-brand-900 flex flex-col min-h-screen antialiased selection:bg-brand-900 selection:text-white">
+
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="/" class="text-2xl font-extrabold tracking-tighter uppercase">LUXE<span class="text-gray-400">.</span></a>
+                </div>
+                <!-- Center Menu -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="/" class="nav-link text-sm font-semibold tracking-wide uppercase text-gray-900">Nouveautés</a>
+                    <a href="/products/" class="nav-link text-sm font-semibold tracking-wide uppercase text-gray-900">Boutique</a>
+                    <a href="#" class="nav-link text-sm font-semibold tracking-wide uppercase text-gray-900">Collections</a>
+                </div>
+                <!-- Icons -->
+                <div class="flex items-center space-x-6">
+                    <div class="md:hidden flex items-center mr-2">
+                        <button id="mobile-menu-btn" class="text-gray-900 focus:outline-none hover:text-gray-600 transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Search Form -->
+                    <form action="{% url 'products:product_list' %}" method="get" class="hidden md:flex items-center relative">
+                        <input type="text" name="q" placeholder="Rechercher..." class="w-32 lg:w-48 text-sm border-b border-gray-300 focus:border-brand-900 outline-none bg-transparent px-2 py-1 placeholder-gray-400 transition-all !border-x-0 !border-t-0 !px-0">
+                        <button type="submit" class="absolute right-0 text-gray-900 hover:text-gray-600 transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </button>
+                    </form>
+
+                    <!-- Wishlist Icon -->
+                    <a href="{% if user.is_authenticated %}{% url 'users:wishlist' %}{% else %}{% url 'users:login' %}{% endif %}" class="text-gray-900 hover:text-gray-600 transition relative">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        {% if user.is_authenticated and user.wishlist.count > 0 %}
+                        <span class="absolute -top-2 -right-2 bg-brand-900 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">
+                            {{ user.wishlist.count }}
+                        </span>
+                        {% endif %}
+                    </a>
+                    <a href="{% if user.is_authenticated %}{% url 'users:profile' %}{% else %}{% url 'users:login' %}{% endif %}" class="text-gray-900 hover:text-gray-600 transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    </a>
+                    <a href="{% url 'cart:cart_detail' %}" class="text-gray-900 hover:text-gray-600 transition relative">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        <span class="absolute -top-2 -right-2 bg-brand-900 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">
+                            {% if cart|length > 0 %}{{ cart|length }}{% else %}0{% endif %}
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-100 absolute w-full shadow-lg">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <a href="/" class="block px-3 py-3 text-sm font-semibold tracking-wide uppercase text-gray-900 hover:bg-brand-50 transition border-b border-gray-50">Nouveautés</a>
+                <a href="/products/" class="block px-3 py-3 text-sm font-semibold tracking-wide uppercase text-gray-900 hover:bg-brand-50 transition border-b border-gray-50">Boutique</a>
+                <a href="#" class="block px-3 py-3 text-sm font-semibold tracking-wide uppercase text-gray-900 hover:bg-brand-50 transition">Collections</a>
+            </div>
+        </div>
+    </nav>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
+            if(btn && menu) {
+                btn.addEventListener('click', () => {
+                    menu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+
+    <!-- Main Content -->
+    <main class="flex-grow animate-fade-in">
+        {% block content %}
+        {% endblock content %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-brand-900 text-white mt-12 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-xl font-bold tracking-widest uppercase mb-4">LUXE.</h3>
+                <p class="text-gray-400 text-sm">L'élégance redéfinie. Découvrez notre dernière collection de mode premium.</p>
+            </div>
+            <div>
+                <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">Boutique</h4>
+                <ul class="space-y-2 text-sm text-gray-400">
+                    <li><a href="#" class="hover:text-white transition">Hommes</a></li>
+                    <li><a href="#" class="hover:text-white transition">Femmes</a></li>
+                    <li><a href="#" class="hover:text-white transition">Accessoires</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">Assistance</h4>
+                <ul class="space-y-2 text-sm text-gray-400">
+                    <li><a href="#" class="hover:text-white transition">Contactez-nous</a></li>
+                    <li><a href="#" class="hover:text-white transition">Livraison & Retours</a></li>
+                    <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">Newsletter</h4>
+                <form class="flex border-b border-gray-700 pb-2">
+                    <input type="email" placeholder="Votre email" class="bg-transparent border-none outline-none w-full text-sm text-white placeholder-gray-500">
+                    <button type="button" class="text-sm font-bold uppercase hover:text-gray-300 transition">OK</button>
+                </form>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
