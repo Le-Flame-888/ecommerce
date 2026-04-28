@@ -1,96 +1,197 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}LUXE. | E-Commerce Premium{% endblock %}
+{% block title %}LUXE. | Pure Style{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="relative h-[80vh] flex items-center justify-center overflow-hidden">
+<!-- Main Hero Section (High Impact) -->
+<section class="relative h-[90vh] flex items-center justify-start overflow-hidden">
     <div class="absolute inset-0 z-0">
-        <img src="{% static 'images/hero.png' %}" alt="Hero Image" class="w-full h-full object-cover object-center filter brightness-75">
+        <img src="{% static 'images/banner_home_1.png' %}" alt="Main Campaign" class="w-full h-full object-cover object-center filter brightness-90">
     </div>
-    <div class="relative z-10 text-center px-4">
-        <h1 class="text-5xl md:text-7xl font-extrabold text-white uppercase tracking-tighter mb-6 drop-shadow-lg">
-            Nouvelle Collection
-        </h1>
-        <p class="text-lg md:text-2xl text-gray-200 mb-10 font-light max-w-2xl mx-auto drop-shadow-md">
-            L'essence du luxe moderne. Minimalisme, qualité et design intemporel.
-        </p>
-        <a href="/products/" class="inline-block bg-white text-brand-900 font-bold uppercase tracking-widest py-4 px-10 hover:bg-gray-100 transition duration-300 transform hover:-translate-y-1 shadow-xl">
-            Découvrir
-        </a>
+    <div class="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent z-1"></div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div class="max-w-xl animate-fade-in">
+            <span class="inline-block bg-brand-900 text-white text-[10px] font-bold uppercase tracking-[0.3em] px-3 py-1 mb-6">Nouvelle Collection</span>
+            <h1 class="text-6xl md:text-8xl font-black text-white uppercase leading-none tracking-tighter mb-8 italic drop-shadow-2xl">
+                REDEFINIR <br>LE LUXE.
+            </h1>
+            <p class="text-xl text-gray-100 mb-10 font-medium max-w-md drop-shadow-md">
+                L'essence du minimalisme contemporain. Découvrez nos pièces iconiques conçues pour durer.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <a href="/products/" class="group relative inline-flex items-center justify-center bg-white text-brand-900 font-black uppercase tracking-widest py-5 px-12 hover:bg-brand-900 hover:text-white transition-all duration-300">
+                    ACHETER MAINTENANT
+                    <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </a>
+                <a href="/products/?category=hommes" class="inline-flex items-center justify-center border-2 border-white text-white font-black uppercase tracking-widest py-5 px-12 hover:bg-white hover:text-brand-900 transition-all duration-300">
+                    HOMMES
+                </a>
+            </div>
+        </div>
     </div>
 </section>
 
-<!-- Featured Categories / Text -->
-<section class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-3xl font-extrabold text-brand-900 uppercase tracking-wide mb-6">Le Style Sans Compromis</h2>
-        <div class="w-24 h-1 bg-brand-900 mx-auto mb-10"></div>
-        <p class="text-gray-500 max-w-3xl mx-auto leading-relaxed">
-            Notre dernière collection redéfinit les standards du streetwear haut de gamme. Chaque pièce est conçue avec une attention méticuleuse aux détails, utilisant les matériaux les plus fins pour une durabilité et un confort inégalés.
-        </p>
+<!-- Benefits Bar -->
+<section class="bg-brand-900 py-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-center gap-4">
+        <div class="flex items-center text-white text-[11px] font-bold uppercase tracking-widest">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            LIVRAISON GRATUITE SUR TOUTES LES COMMANDES
+        </div>
+        <div class="flex items-center text-white text-[11px] font-bold uppercase tracking-widest border-x-0 md:border-x border-gray-700 px-0 md:px-8">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3"></path></svg>
+            RETOURS GRATUITS SOUS 30 JOURS
+        </div>
+        <div class="flex items-center text-white text-[11px] font-bold uppercase tracking-widest">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            PAIEMENT SÉCURISÉ & À LA LIVRAISON
+        </div>
     </div>
 </section>
 
-<!-- Featured Products Demo (Static placeholders for now before views are fully connected) -->
-<section class="py-16 bg-brand-50">
+<!-- Shop by Category (Adidas Style Grid) -->
+<section class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-end mb-12">
-            <h2 class="text-3xl font-extrabold text-brand-900 uppercase tracking-tight">Tendances Actuelles</h2>
-            <a href="/products/" class="text-sm font-bold uppercase tracking-wider text-brand-900 hover:text-gray-500 transition border-b-2 border-brand-900 hover:border-gray-500 pb-1">Voir tout</a>
+        <h2 class="text-4xl font-black text-brand-900 uppercase tracking-tighter mb-12 italic">SHOP BY CATEGORY</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Men Tile -->
+            <a href="/products/?category=hommes" class="group relative aspect-[3/4] overflow-hidden bg-gray-100">
+                <img src="{% static 'images/sneaker.png' %}" alt="Hommes" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <div class="absolute bottom-10 left-10">
+                    <h3 class="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">HOMMES</h3>
+                    <span class="inline-block bg-white text-brand-900 font-bold uppercase py-3 px-8 text-xs tracking-widest group-hover:bg-brand-900 group-hover:text-white transition">DÉCOUVRIR</span>
+                </div>
+            </a>
+            <!-- Women Tile -->
+            <a href="/products/?category=femmes" class="group relative aspect-[3/4] overflow-hidden bg-gray-100">
+                <img src="{% static 'images/hero.png' %}" alt="Femmes" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <div class="absolute bottom-10 left-10">
+                    <h3 class="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">FEMMES</h3>
+                    <span class="inline-block bg-white text-brand-900 font-bold uppercase py-3 px-8 text-xs tracking-widest group-hover:bg-brand-900 group-hover:text-white transition">DÉCOUVRIR</span>
+                </div>
+            </a>
+            <!-- Accessories Tile -->
+            <a href="/products/?category=accessoires" class="group relative aspect-[3/4] overflow-hidden bg-gray-100">
+                <img src="{% static 'images/tshirt.png' %}" alt="Accessoires" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <div class="absolute bottom-10 left-10">
+                    <h3 class="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">ACCESSOIRES</h3>
+                    <span class="inline-block bg-white text-brand-900 font-bold uppercase py-3 px-8 text-xs tracking-widest group-hover:bg-brand-900 group-hover:text-white transition">DÉCOUVRIR</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Trending Products (Larger Grid) -->
+<section class="py-20 bg-brand-50 border-y border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
+            <div>
+                <h2 class="text-5xl font-black text-brand-900 uppercase tracking-tighter mb-2 italic">ACTUELLEMENT</h2>
+                <div class="h-2 w-48 bg-brand-900"></div>
+            </div>
+            <a href="/products/" class="text-sm font-black uppercase tracking-[0.2em] text-brand-900 border-b-4 border-brand-900 pb-1 hover:text-gray-500 hover:border-gray-500 transition">Voir toute la collection</a>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {% for product in featured_products %}
-            <div class="group relative">
+            <div class="group relative bg-white border border-transparent hover:border-gray-200 transition duration-300 p-2">
                 <a href="{% url 'products:product_detail' product.slug %}" class="block">
-                    <div class="relative bg-white overflow-hidden aspect-[4/5] mb-4">
+                    <div class="relative overflow-hidden aspect-[4/5] bg-brand-100 mb-6">
                         {% if product.images.first %}
-                        <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500 ease-in-out">
+                        <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-1000 ease-in-out">
                         {% else %}
-                        <div class="w-full h-full flex items-center justify-center bg-gray-200">
-                            <span class="text-gray-400 uppercase text-xs font-bold tracking-widest">Image indisponible</span>
-                        </div>
+                        <div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 font-bold italic tracking-widest">LUXE.</div>
                         {% endif %}
-                        <div class="absolute inset-x-0 bottom-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-black/50 to-transparent">
-                            <span class="block w-full bg-white text-center text-brand-900 font-bold uppercase py-3 text-sm tracking-widest hover:bg-gray-100 transition">Voir le produit</span>
+                        
+                        <!-- Quick labels -->
+                        <div class="absolute top-4 left-4 flex flex-col gap-2">
+                            <span class="bg-white text-brand-900 text-[10px] font-black uppercase px-2 py-1 shadow-sm">Nouveau</span>
+                            {% if product.base_price > 500 %}
+                            <span class="bg-brand-900 text-white text-[10px] font-black uppercase px-2 py-1 shadow-sm">Premium</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Add to cart quick button -->
+                        <div class="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                            <span class="block w-full bg-brand-900 text-white text-center font-black uppercase py-4 text-xs tracking-widest">Détails Rapides</span>
                         </div>
                     </div>
                 </a>
                 
+                <!-- Info -->
+                <div class="px-2 pb-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="text-sm font-black uppercase text-brand-900 tracking-tight">{{ product.name }}</h3>
+                            <p class="text-xs text-gray-500 uppercase font-bold italic">{{ product.category.name|default:"Style" }}</p>
+                        </div>
+                        <span class="text-sm font-black text-brand-900">{{ product.base_price }} MAD</span>
+                    </div>
+                </div>
+
                 <!-- Wishlist Heart Overlay -->
-                <div class="absolute top-2 right-2 z-10">
+                <div class="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                     {% if user.is_authenticated %}
                         <form action="{% url 'users:toggle_wishlist' product.id %}" method="post">
                             {% csrf_token %}
-                            <button type="submit" class="bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-sm text-gray-400 hover:text-red-500 hover:scale-110 transition {% if product in user.wishlist.all %}text-red-500 fill-current{% endif %}">
-                                <svg class="w-4 h-4 {% if product in user.wishlist.all %}fill-current{% else %}fill-none{% endif %}" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                            <button type="submit" class="bg-white p-3 rounded-none shadow-xl text-gray-400 hover:text-red-600 transition duration-300">
+                                <svg class="w-5 h-5 {% if product in user.wishlist.all %}fill-current text-red-600{% else %}fill-none{% endif %}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                             </button>
                         </form>
-                    {% else %}
-                        <a href="{% url 'users:login' %}?next={{ request.path }}" class="block bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-sm text-gray-400 hover:text-red-500 hover:scale-110 transition">
-                            <svg class="w-4 h-4 fill-none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                        </a>
                     {% endif %}
                 </div>
-
-                <a href="{% url 'products:product_detail' product.slug %}" class="block mt-2">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="text-sm font-bold uppercase text-brand-900 mb-1">{{ product.name }}</h3>
-                            <p class="text-xs text-gray-500 uppercase">{{ product.category.name|default:"Tendance" }}</p>
-                        </div>
-                        <span class="text-sm font-bold text-brand-900">{{ product.base_price }} MAD</span>
-                    </div>
-                </a>
-            </div>
-            {% empty %}
-            <div class="col-span-full text-center py-10">
-                <p class="text-gray-500 uppercase tracking-widest">Les nouveaux produits arrivent bientôt.</p>
             </div>
             {% endfor %}
         </div>
     </div>
 </section>
+
+<!-- Lifestyle Banner / Brand Story (Secondary) -->
+<section class="relative h-[60vh] flex items-center overflow-hidden">
+    <div class="absolute inset-0 z-0">
+        <img src="{% static 'images/banner_home_2.png' %}" alt="Accessories Collection" class="w-full h-full object-cover">
+    </div>
+    <div class="absolute inset-0 bg-black/40 z-1"></div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-xl text-white">
+            <h2 class="text-4xl md:text-6xl font-black uppercase italic tracking-tighter mb-6">ACCESSOIREZ <br>VOTRE MONDE.</h2>
+            <p class="text-lg text-gray-200 mb-8 max-w-md font-medium">Les détails font la différence. Explorez notre gamme d'accessoires premium pour parfaire votre look.</p>
+            <a href="/products/?category=accessoires" class="inline-block bg-white text-brand-900 font-black uppercase tracking-widest py-4 px-10 hover:bg-brand-900 hover:text-white transition duration-300">DÉCOUVRIR LA GAMME</a>
+        </div>
+    </div>
+</section>
+
+<!-- Instagram / Grid Section -->
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-black uppercase tracking-tighter mb-4 italic">NOUS SOMMES LUXE.</h2>
+        <p class="text-gray-500 mb-12 max-w-2xl mx-auto font-medium">Partagez votre style avec #LUXESTYLE et rejoignez la communauté.</p>
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-2">
+            <div class="aspect-square bg-gray-100"><img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover"></div>
+            <div class="aspect-square bg-gray-100"><img src="https://images.unsplash.com/photo-1539109132382-381bb3f1c2b3?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover"></div>
+            <div class="aspect-square bg-gray-100"><img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover"></div>
+            <div class="aspect-square bg-gray-100"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover"></div>
+            <div class="aspect-square bg-gray-100"><img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover"></div>
+            <div class="aspect-square bg-gray-100"><img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&q=80&w=400" class="w-full h-full object-cover"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Membership / CTA Section -->
+<section class="py-20 bg-brand-900 text-white">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+        <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-6 italic italic">REJOIGNEZ LE CLUB LUXE.</h2>
+        <p class="text-lg text-gray-400 mb-10 font-medium italic italic tracking-wide">Inscrivez-vous pour bénéficier de 15% de réduction sur votre première commande et recevez nos nouveautés en avant-première.</p>
+        <form class="flex flex-col sm:flex-row gap-0 max-w-xl mx-auto">
+            <input type="email" placeholder="VOTRE EMAIL" class="flex-grow bg-white text-brand-900 font-bold border-none outline-none px-6 py-4 placeholder-gray-400 !border-0 !p-4">
+            <button type="button" class="bg-gray-200 text-brand-900 font-black uppercase tracking-widest px-8 py-4 hover:bg-white transition duration-300">S'INSCRIRE</button>
+        </form>
+    </div>
+</section>
+
 {% endblock content %}

@@ -37,7 +37,21 @@
                                 </div>
                             </td>
                             <td class="py-6 text-center text-sm text-gray-500 uppercase">{{ variant.size }} / {{ variant.color }}</td>
-                            <td class="py-6 text-center text-sm font-semibold">{{ item.quantity }}</td>
+                            <td class="py-6 text-center">
+                                <div class="flex items-center justify-center space-x-2">
+                                    <form action="{% url 'cart:cart_update' variant.id %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="quantity" value="{{ item.quantity|add:'-1' }}">
+                                        <button type="submit" class="w-8 h-8 border border-gray-300 text-gray-600 hover:bg-gray-100 transition flex items-center justify-center text-lg font-bold" {% if item.quantity <= 1 %}disabled class="opacity-40 cursor-not-allowed"{% endif %}>−</button>
+                                    </form>
+                                    <span class="w-10 text-center text-sm font-bold text-brand-900">{{ item.quantity }}</span>
+                                    <form action="{% url 'cart:cart_update' variant.id %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="quantity" value="{{ item.quantity|add:'1' }}">
+                                        <button type="submit" class="w-8 h-8 border border-gray-300 text-gray-600 hover:bg-gray-100 transition flex items-center justify-center text-lg font-bold">+</button>
+                                    </form>
+                                </div>
+                            </td>
                             <td class="py-6 text-right text-sm font-bold text-brand-900">{{ item.total_price }} MAD</td>
                             <td class="py-6 text-right">
                                 <form action="{% url 'cart:cart_remove' variant.id %}" method="post">

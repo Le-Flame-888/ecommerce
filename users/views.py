@@ -1,8 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .forms import CustomUserCreationForm, AddressForm
 from .models import Address
+from products.models import Product
 
 def register(request):
     if request.user.is_authenticated:
@@ -13,6 +15,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+            messages.success(request, f'Bienvenue {user.username} ! Votre compte a été créé.')
             return redirect('/')
     else:
         form = CustomUserCreationForm()
@@ -29,6 +32,7 @@ def profile(request):
             if not addresses.exists():
                 address.is_default = True
             address.save()
+            messages.success(request, 'Adresse ajoutée avec succès.')
             return redirect('users:profile')
     else:
         address_form = AddressForm()
@@ -38,8 +42,6 @@ def profile(request):
         'address_form': address_form
     })
 
-from products.models import Product
-
 @login_required
 def wishlist(request):
     products = request.user.wishlist.all()
@@ -47,10 +49,11 @@ def wishlist(request):
 
 @login_required
 def toggle_wishlist(request, product_id):
-    from django.shortcuts import get_object_or_404
     product = get_object_or_404(Product, id=product_id)
     if product in request.user.wishlist.all():
         request.user.wishlist.remove(product)
+        messages.success(request, f'"{product.name}" retiré des favoris.')
     else:
         request.user.wishlist.add(product)
+        messages.success(request, f'"{product.name}" ajouté aux favoris !')
     return redirect(request.META.get('HTTP_REFERER', 'products:product_list'))

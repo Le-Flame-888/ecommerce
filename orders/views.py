@@ -33,9 +33,7 @@ def checkout(request):
                 variant.save()
             
             cart.clear()
-            # In a real app, send email here
-            print(f"DEBUG: Order {order.id} confirmed. Email sent to {order.email}")
-            
+            messages.success(request, f'Commande #{order.id} confirmée avec succès !')
             return render(request, 'orders/success.html', {'order': order})
     else:
         # Pre-fill form if user is authenticated and has a default address

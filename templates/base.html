@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}E-Commerce Premium{% endblock %}</title>
-    <!-- Tailwind CSS (CDN for EFM simplicity) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -27,7 +26,6 @@
         }
     </script>
     <style>
-        /* Base styles for standard Django form inputs */
         input[type="text"], input[type="email"], input[type="password"], input[type="tel"] {
             border-width: 1px !important;
             border-color: #d1d5db !important;
@@ -41,23 +39,43 @@
             box-shadow: 0 0 0 1px #000 !important;
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Barlow+Condensed:ital,wght@0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, .font-condensed { font-family: 'Barlow Condensed', sans-serif; }
+
         .nav-link { position: relative; transition: color 0.3s ease; }
         .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -4px; left: 0; background-color: #000; transition: width 0.3s ease; }
         .nav-link:hover::after { width: 100%; }
-        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-in {
-            animation: fadeIn 0.8s ease-out forwards;
-        }
+        .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .toast-animate { animation: slideDown 0.4s ease-out forwards; }
     </style>
 </head>
 <body class="bg-brand-50 text-brand-900 flex flex-col min-h-screen antialiased selection:bg-brand-900 selection:text-white">
+
+    <!-- Toast Messages -->
+    {% if messages %}
+    <div id="toast-container" class="fixed top-24 right-4 z-[100] space-y-2 max-w-sm">
+        {% for message in messages %}
+        <div class="toast-animate flex items-center px-5 py-3 shadow-lg border text-sm font-semibold {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800{% elif message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% elif message.tags == 'warning' %}bg-yellow-50 border-yellow-200 text-yellow-800{% else %}bg-white border-gray-200 text-gray-800{% endif %}">
+            {% if message.tags == 'success' %}
+            <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            {% elif message.tags == 'error' %}
+            <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            {% elif message.tags == 'warning' %}
+            <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            {% endif %}
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    <script>setTimeout(() => { const t = document.getElementById('toast-container'); if(t) t.style.display = 'none'; }, 4000);</script>
+    {% endif %}
 
     <!-- Navigation -->
     <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
@@ -71,7 +89,7 @@
                 <div class="hidden md:flex space-x-8">
                     <a href="/" class="nav-link text-sm font-semibold tracking-wide uppercase text-gray-900">Nouveautés</a>
                     <a href="/products/" class="nav-link text-sm font-semibold tracking-wide uppercase text-gray-900">Boutique</a>
-                    <a href="#" class="nav-link text-sm font-semibold tracking-wide uppercase text-gray-900">Collections</a>
+                    <a href="{% url 'contact' %}" class="nav-link text-sm font-semibold tracking-wide uppercase text-gray-900">Contact</a>
                 </div>
                 <!-- Icons -->
                 <div class="flex items-center space-x-6">
@@ -110,12 +128,12 @@
                 </div>
             </div>
         </div>
-        <!-- Mobile Menu (Hidden by default) -->
+        <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-100 absolute w-full shadow-lg">
             <div class="px-4 pt-2 pb-6 space-y-2">
                 <a href="/" class="block px-3 py-3 text-sm font-semibold tracking-wide uppercase text-gray-900 hover:bg-brand-50 transition border-b border-gray-50">Nouveautés</a>
                 <a href="/products/" class="block px-3 py-3 text-sm font-semibold tracking-wide uppercase text-gray-900 hover:bg-brand-50 transition border-b border-gray-50">Boutique</a>
-                <a href="#" class="block px-3 py-3 text-sm font-semibold tracking-wide uppercase text-gray-900 hover:bg-brand-50 transition">Collections</a>
+                <a href="{% url 'contact' %}" class="block px-3 py-3 text-sm font-semibold tracking-wide uppercase text-gray-900 hover:bg-brand-50 transition">Contact</a>
             </div>
         </div>
     </nav>
@@ -124,9 +142,7 @@
             const btn = document.getElementById('mobile-menu-btn');
             const menu = document.getElementById('mobile-menu');
             if(btn && menu) {
-                btn.addEventListener('click', () => {
-                    menu.classList.toggle('hidden');
-                });
+                btn.addEventListener('click', () => { menu.classList.toggle('hidden'); });
             }
         });
     </script>
@@ -147,23 +163,21 @@
             <div>
                 <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">Boutique</h4>
                 <ul class="space-y-2 text-sm text-gray-400">
-                    <li><a href="#" class="hover:text-white transition">Hommes</a></li>
-                    <li><a href="#" class="hover:text-white transition">Femmes</a></li>
-                    <li><a href="#" class="hover:text-white transition">Accessoires</a></li>
+                    <li><a href="/products/" class="hover:text-white transition">Tous les produits</a></li>
+                    <li><a href="/" class="hover:text-white transition">Nouveautés</a></li>
                 </ul>
             </div>
             <div>
                 <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">Assistance</h4>
                 <ul class="space-y-2 text-sm text-gray-400">
-                    <li><a href="#" class="hover:text-white transition">Contactez-nous</a></li>
-                    <li><a href="#" class="hover:text-white transition">Livraison & Retours</a></li>
-                    <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                    <li><a href="{% url 'contact' %}" class="hover:text-white transition">Contactez-nous</a></li>
+                    <li><a href="{% url 'contact' %}" class="hover:text-white transition">FAQ</a></li>
                 </ul>
             </div>
             <div>
                 <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">Newsletter</h4>
                 <form class="flex border-b border-gray-700 pb-2">
-                    <input type="email" placeholder="Votre email" class="bg-transparent border-none outline-none w-full text-sm text-white placeholder-gray-500">
+                    <input type="email" placeholder="Votre email" class="bg-transparent border-none outline-none w-full text-sm text-white placeholder-gray-500 !border-0 !p-0">
                     <button type="button" class="text-sm font-bold uppercase hover:text-gray-300 transition">OK</button>
                 </form>
             </div>

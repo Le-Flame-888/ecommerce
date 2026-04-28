@@ -36,6 +36,19 @@
             
             <!-- Product Grid -->
             <div class="flex-grow">
+                <!-- Sort Bar -->
+                <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+                    <p class="text-sm text-gray-500">{{ page_obj.paginator.count }} produit{{ page_obj.paginator.count|pluralize }}</p>
+                    <div class="flex items-center space-x-2">
+                        <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Trier par:</label>
+                        <select onchange="window.location.href=this.value" class="text-sm border border-gray-300 px-3 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-brand-900 cursor-pointer">
+                            <option value="?sort=newest{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" {% if current_sort == 'newest' %}selected{% endif %}>Nouveautés</option>
+                            <option value="?sort=price_asc{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" {% if current_sort == 'price_asc' %}selected{% endif %}>Prix croissant</option>
+                            <option value="?sort=price_desc{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" {% if current_sort == 'price_desc' %}selected{% endif %}>Prix décroissant</option>
+                            <option value="?sort=name{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" {% if current_sort == 'name' %}selected{% endif %}>A - Z</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-10 gap-x-6 xl:gap-x-8">
                     {% for product in products %}
                     <div class="group relative">
