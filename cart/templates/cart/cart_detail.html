@@ -66,6 +66,16 @@
                         {% endfor %}
                     </tbody>
                 </table>
+
+                <!-- Coupon Form -->
+                <div class="mt-10 border-t border-gray-100 pt-8">
+                    <h3 class="text-sm font-bold text-brand-900 uppercase tracking-wider mb-4">Avez-vous un code promo ?</h3>
+                    <form action="{% url 'coupons:apply' %}" method="post" class="flex max-w-sm">
+                        {% csrf_token %}
+                        <input type="text" name="code" placeholder="Entrez votre code" class="flex-grow border border-gray-300 px-4 py-2 text-sm rounded-none focus:outline-none focus:ring-1 focus:ring-brand-900 focus:border-brand-900">
+                        <button type="submit" class="bg-brand-900 text-white font-bold uppercase text-xs tracking-widest px-6 py-2 hover:bg-black transition">Appliquer</button>
+                    </form>
+                </div>
             </div>
 
             <!-- Order Summary -->
@@ -75,13 +85,21 @@
                     <span>Sous-total</span>
                     <span class="font-semibold">{{ cart.get_total_price }} MAD</span>
                 </div>
+                
+                {% if cart.coupon %}
+                <div class="flex justify-between items-center mb-4 text-sm text-brand-600 font-medium">
+                    <span>Code promo ({{ cart.coupon.code }} -{{ cart.coupon.discount }}%)</span>
+                    <span>-{{ cart.get_discount }} MAD</span>
+                </div>
+                {% endif %}
+
                 <div class="flex justify-between items-center mb-6 text-sm text-gray-500">
                     <span>Livraison</span>
                     <span class="font-semibold text-green-600 uppercase">Gratuite</span>
                 </div>
                 <div class="flex justify-between items-center mb-8 border-t border-gray-200 pt-4">
                     <span class="text-base font-bold text-brand-900 uppercase">Total</span>
-                    <span class="text-xl font-bold text-brand-900">{{ cart.get_total_price }} MAD</span>
+                    <span class="text-xl font-bold text-brand-900">{{ cart.get_total_price_after_discount }} MAD</span>
                 </div>
                 <a href="{% url 'orders:checkout' %}" class="block w-full bg-brand-900 text-white text-center font-bold uppercase tracking-widest py-4 hover:bg-black transition duration-300">
                     Passer à la caisse

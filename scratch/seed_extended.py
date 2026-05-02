@@ -1,9 +1,13 @@
 import os
+import sys
 import django
 import shutil
 import requests
 from django.core.files import File
-from django.core.files.temp import NamedTemporaryFile
+from django.core.files.base import ContentFile
+
+# Add the project root to sys.path
+sys.path.append(os.getcwd())
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ecom_project.settings')
 django.setup()
@@ -21,19 +25,21 @@ def add_product(name, slug, category_name, description, price, img_url, size, st
         defaults={'name': name, 'category': cat, 'description': description, 'base_price': price}
     )
     
-    if created:
-        # Add a few variants
+    # Add variant if it doesn't exist
+    if not ProductVariant.objects.filter(product=product, size=size).exists():
         ProductVariant.objects.create(product=product, size=size, color='Standard', stock=stock)
-        
+    
+    # Add image if it doesn't exist
+    if not ProductImage.objects.filter(product=product).exists():
         # Download image
         try:
             response = requests.get(img_url, timeout=10)
             if response.status_code == 200:
-                img_temp = NamedTemporaryFile(delete=True)
-                img_temp.write(response.content)
-                img_temp.flush()
-                ProductImage.objects.create(product=product, image=File(img_temp, name=f'{slug}.jpg'))
-                print(f"Added product: {name}")
+                ProductImage.objects.create(
+                    product=product, 
+                    image=ContentFile(response.content, name=f'{slug}.jpg')
+                )
+                print(f"Added image for: {name}")
         except Exception as e:
             print(f"Failed to add image for {name}: {e}")
 

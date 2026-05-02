@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Confirmation de commande LUXE.</title>
+</head>
+<body style="font-family: Inter, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #111827; font-family: 'Barlow Condensed', sans-serif;">LUXE.</h1>
+        <p style="color: #6b7280;">Confirmation de commande</p>
+    </div>
+    
+    <h2 style="color: #111827;">Bonjour {{ order.first_name }},</h2>
+    
+    <p>Merci pour votre commande ! Nous sommes ravis de vous compter parmi nos clients. Voici les détails de votre achat :</p>
+    
+    <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="color: #111827; margin-top: 0;">Commande #{{ order.id }}</h3>
+        <p><strong>Date :</strong> {{ order.created_at|date:"d M Y" }}</p>
+        <p><strong>Statut :</strong> {{ order.get_status_display }}</p>
+    </div>
+    
+    <h3 style="color: #111827;">Articles commandés :</h3>
+    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <thead>
+            <tr>
+                <th style="text-align: left; padding: 10px; border-bottom: 2px solid #e5e7eb;">Produit</th>
+                <th style="text-align: left; padding: 10px; border-bottom: 2px solid #e5e7eb;">Taille/Couleur</th>
+                <th style="text-align: left; padding: 10px; border-bottom: 2px solid #e5e7eb;">Quantité</th>
+                <th style="text-align: left; padding: 10px; border-bottom: 2px solid #e5e7eb;">Prix unitaire</th>
+                <th style="text-align: left; padding: 10px; border-bottom: 2px solid #e5e7eb;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                    {{ item.variant.product.name }}
+                </td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                    {{ item.variant.size }} / {{ item.variant.color }}
+                </td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                    {{ item.quantity }}
+                </td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                    {{ item.price }} MAD
+                </td>
+                <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                    {{ item.get_cost }} MAD
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" style="text-align: right; padding: 10px; border-top: 2px solid #e5e7eb; font-weight: bold;">
+                    Sous-total:
+                </td>
+                <td style="padding: 10px; border-top: 2px solid #e5e7eb; font-weight: bold;">
+                    {{ order.total_amount }} MAD
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    
+    <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="color: #111827; margin-top: 0;">Adresse de livraison :</h3>
+        <p>
+            {{ order.first_name }} {{ order.last_name }}<br>
+            {{ order.street }}<br>
+            {{ order.postal_code }} {{ order.city }}<br>
+            {{ order.country }}
+        </p>
+    </div>
+    
+    <p>Nous traiterons votre commande dans les plus brefs délais. Vous recevrez un email lorsque votre commande sera expédiée.</p>
+    
+    <p>Si vous avez des questions, n'hésitez pas à nous contacter à <a href="mailto:support@luxeshop.com" style="color: #111827; text-decoration: none;">support@luxeshop.com</a>.</p>
+    
+    <div style="text-align: center; margin-top: 30px; color: #6b7280; font-size: 0.9em;">
+        <p>LUXE. - L'élégance redéfinie</p>
+        <p>&copy; {{ order.created_at|date:"Y" }} LUXE. Tous droits réservés.</p>
+    </div>
+</body>
+</html>

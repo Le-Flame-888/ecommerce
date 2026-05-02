@@ -43,6 +43,12 @@ def cart_remove(request, variant_id):
     messages.success(request, f'"{variant.product.name}" retiré du panier.')
     return redirect('cart:cart_detail')
 
+from coupons.forms import CouponApplyForm
+
 def cart_detail(request):
     cart = Cart(request)
-    return render(request, 'cart/cart_detail.html', {'cart': cart})
+    coupon_apply_form = CouponApplyForm()
+    return render(request, 'cart/cart_detail.html', {
+        'cart': cart,
+        'coupon_apply_form': coupon_apply_form
+    })

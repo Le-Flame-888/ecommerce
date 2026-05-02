@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from django.conf import settings
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -14,6 +15,10 @@ class Category(models.Model):
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('products:product_list') + f'?category={self.slug}'
 
     def __str__(self):
         if self.parent:
@@ -35,8 +40,21 @@ class Product(models.Model):
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('products:product_detail', kwargs={'slug': self.slug})
+
     def __str__(self):
         return self.name
+
+    def get_average_rating(self):
+        reviews = self.reviews.all()
+        if not reviews:
+            return 0
+        return sum([review.rating for review in reviews]) / reviews.count()
+
+    def get_review_count(self):
+        return self.reviews.count()
 
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
@@ -60,3 +78,17 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.product.name}"
+
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 6)])
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ('product', 'user') # One review per user per product
+
+    def __str__(self):
+        return f"Review by {self.user.username} for {self.product.name}"

@@ -3,6 +3,7 @@ from django.contrib import messages
 from .models import OrderItem
 from .forms import OrderCreateForm
 from cart.cart import Cart
+from .emails import send_order_confirmation_email
 
 def checkout(request):
     cart = Cart(request)
@@ -15,7 +16,13 @@ def checkout(request):
             order = form.save(commit=False)
             if request.user.is_authenticated:
                 order.user = request.user
-            order.total_amount = cart.get_total_price()
+            
+            # Apply coupon if exists
+            if cart.coupon:
+                order.coupon = cart.coupon
+                order.discount = cart.coupon.discount
+            
+            order.total_amount = cart.get_total_price_after_discount()
             order.save()
             
             for item in cart:
@@ -31,6 +38,9 @@ def checkout(request):
                 if variant.stock < 0:
                     variant.stock = 0
                 variant.save()
+            
+            # Send order confirmation email
+            send_order_confirmation_email(order)
             
             cart.clear()
             messages.success(request, f'Commande #{order.id} confirmée avec succès !')
@@ -55,4 +65,21 @@ def checkout(request):
                 })
         form = OrderCreateForm(initial=initial_data)
         
-    return render(request, 'orders/checkout.html', {'cart': cart, 'form': form})
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+
+@login_required
+@require_POST
+def order_cancel(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    
+    # Only allow cancellation if order is not yet shipped
+    if order.status in ['pending', 'confirmed']:
+        if order.cancel_order():
+            messages.success(request, f"La commande #{order.id} a été annulée et le stock a été restauré.")
+        else:
+            messages.warning(request, "La commande est déjà annulée.")
+    else:
+        messages.error(request, "Impossible d'annuler une commande déjà expédiée ou livrée.")
+    
+    return redirect('users:profile')

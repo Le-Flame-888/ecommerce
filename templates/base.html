@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}E-Commerce Premium{% endblock %}</title>
+    <meta name="description" content="LUXE. - Découvrez notre collection exclusive de mode premium. Élégance, qualité et design minimaliste.">
+    <meta name="keywords" content="mode, luxe, vêtements, premium, e-commerce">
+    <meta property="og:title" content="LUXE. | E-Commerce Premium">
+    <meta property="og:description" content="Découvrez notre collection exclusive de mode premium.">
+    <meta property="og:type" content="website">
+    {% block extra_meta %}{% endblock %}
+    <title>{% block title %}LUXE. | E-Commerce Premium{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -176,9 +182,10 @@
             </div>
             <div>
                 <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">Newsletter</h4>
-                <form class="flex border-b border-gray-700 pb-2">
-                    <input type="email" placeholder="Votre email" class="bg-transparent border-none outline-none w-full text-sm text-white placeholder-gray-500 !border-0 !p-0">
-                    <button type="button" class="text-sm font-bold uppercase hover:text-gray-300 transition">OK</button>
+                <form action="{% url 'newsletter_signup' %}" method="post" class="flex border-b border-gray-700 pb-2">
+                    {% csrf_token %}
+                    <input type="email" name="email" placeholder="Votre email" required class="bg-transparent border-none outline-none w-full text-sm text-white placeholder-gray-500 !border-0 !p-0">
+                    <button type="submit" class="text-sm font-bold uppercase hover:text-gray-300 transition">OK</button>
                 </form>
             </div>
         </div>

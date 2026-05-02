@@ -187,9 +187,10 @@
     <div class="max-w-4xl mx-auto px-4 text-center">
         <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-6 italic italic">REJOIGNEZ LE CLUB LUXE.</h2>
         <p class="text-lg text-gray-400 mb-10 font-medium italic italic tracking-wide">Inscrivez-vous pour bénéficier de 15% de réduction sur votre première commande et recevez nos nouveautés en avant-première.</p>
-        <form class="flex flex-col sm:flex-row gap-0 max-w-xl mx-auto">
-            <input type="email" placeholder="VOTRE EMAIL" class="flex-grow bg-white text-brand-900 font-bold border-none outline-none px-6 py-4 placeholder-gray-400 !border-0 !p-4">
-            <button type="button" class="bg-gray-200 text-brand-900 font-black uppercase tracking-widest px-8 py-4 hover:bg-white transition duration-300">S'INSCRIRE</button>
+        <form action="{% url 'newsletter_signup' %}" method="post" class="flex flex-col sm:flex-row gap-0 max-w-xl mx-auto">
+            {% csrf_token %}
+            <input type="email" name="email" placeholder="VOTRE EMAIL" required class="flex-grow bg-white text-brand-900 font-bold border-none outline-none px-6 py-4 placeholder-gray-400 !border-0 !p-4">
+            <button type="submit" class="bg-gray-200 text-brand-900 font-black uppercase tracking-widest px-8 py-4 hover:bg-white transition duration-300">S'INSCRIRE</button>
         </form>
     </div>
 </section>

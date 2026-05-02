@@ -75,11 +75,17 @@
                                     </span>
                                 </div>
                                 <p class="text-sm font-bold text-brand-900 mb-2">{{ order.total_amount }} MAD</p>
-                                <div class="text-xs text-gray-600">
+                                <div class="text-xs text-gray-600 mb-4">
                                     {% for item in order.items.all %}
                                         <p>- {{ item.quantity }}x {{ item.variant.product.name }} ({{ item.variant.size }} / {{ item.variant.color }})</p>
                                     {% endfor %}
                                 </div>
+                                {% if order.status == 'pending' or order.status == 'confirmed' %}
+                                <form action="{% url 'orders:order_cancel' order.id %}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette commande ?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-[10px] font-bold text-red-600 uppercase hover:underline tracking-widest">Annuler la commande</button>
+                                </form>
+                                {% endif %}
                             </div>
                             {% endfor %}
                         </div>

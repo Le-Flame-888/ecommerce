@@ -6,6 +6,9 @@ from .forms import CustomUserCreationForm, AddressForm
 from .models import Address
 from products.models import Product
 
+from django.core.mail import send_mail
+from django.conf import settings
+
 def register(request):
     if request.user.is_authenticated:
         return redirect('/')
@@ -14,6 +17,19 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            
+            # Send Welcome Email
+            try:
+                send_mail(
+                    'Bienvenue chez LUXE. !',
+                    f'Bonjour {user.username},\n\nMerci d\'avoir rejoint LUXE. ! Nous sommes ravis de vous compter parmi nos membres.\n\nCommencez à explorer nos collections dès maintenant : http://127.0.0.1:8000/products/\n\nL\'équipe LUXE.',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email],
+                    fail_silently=True,
+                )
+            except:
+                pass
+                
             login(request, user)
             messages.success(request, f'Bienvenue {user.username} ! Votre compte a été créé.')
             return redirect('/')

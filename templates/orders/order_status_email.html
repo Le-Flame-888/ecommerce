@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Mise à jour de votre commande LUXE.</title>
+</head>
+<body style="font-family: Inter, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="color: #111827; font-family: 'Barlow Condensed', sans-serif;">LUXE.</h1>
+        <p style="color: #6b7280;">Mise à jour de commande</p>
+    </div>
+    
+    <h2 style="color: #111827;">Bonjour {{ order.first_name }},</h2>
+    
+    <p>Nous avons le plaisir de vous informer que votre commande <strong>#{{ order.id }}</strong> a <strong>{{ status_text }}</strong> !</p>
+    
+    <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <p><strong>Nouveau statut :</strong> {{ order.get_status_display }}</p>
+        <p><strong>Date de mise à jour :</strong> {{ order.updated_at|date:"d M Y H:i" }}</p>
+    </div>
+    
+    {% if order.status == 'shipped' %}
+    <p>Votre colis est en route. Vous le recevrez très prochainement à l'adresse suivante :</p>
+    <div style="background-color: #ffffff; padding: 15px; border: 1px solid #e5e7eb; border-radius: 8px; margin: 10px 0;">
+        <p style="margin: 0;">
+            {{ order.street }}<br>
+            {{ order.postal_code }} {{ order.city }}<br>
+            {{ order.country }}
+        </p>
+    </div>
+    {% elif order.status == 'delivered' %}
+    <p>Nous espérons que vous apprécierez votre achat ! N'hésitez pas à nous faire part de vos commentaires.</p>
+    {% endif %}
+    
+    <p>Merci de votre confiance.</p>
+    
+    <p>Si vous avez des questions, n'hésitez pas à nous contacter à <a href="mailto:support@luxeshop.com" style="color: #111827; text-decoration: none;">support@luxeshop.com</a>.</p>
+    
+    <div style="text-align: center; margin-top: 30px; color: #6b7280; font-size: 0.9em;">
+        <p>LUXE. - L'élégance redéfinie</p>
+        <p>&copy; {% now "Y" %} LUXE. Tous droits réservés.</p>
+    </div>
+</body>
+</html>

@@ -94,6 +94,12 @@
                         <span>Sous-total</span>
                         <span>{{ cart.get_total_price }} MAD</span>
                     </div>
+                    {% if cart.coupon %}
+                    <div class="flex justify-between text-sm text-brand-600 font-medium mb-2">
+                        <span>Réduction ({{ cart.coupon.code }} -{{ cart.coupon.discount }}%)</span>
+                        <span>-{{ cart.get_discount }} MAD</span>
+                    </div>
+                    {% endif %}
                     <div class="flex justify-between text-sm text-gray-500">
                         <span>Livraison</span>
                         <span class="text-green-600 uppercase font-semibold">Gratuite</span>
@@ -102,7 +108,7 @@
 
                 <div class="flex justify-between items-center border-t border-gray-200 pt-4">
                     <span class="text-base font-bold text-brand-900 uppercase">Total à payer</span>
-                    <span class="text-xl font-bold text-brand-900">{{ cart.get_total_price }} MAD</span>
+                    <span class="text-xl font-bold text-brand-900">{{ cart.get_total_price_after_discount }} MAD</span>
                 </div>
             </div>
         </div>

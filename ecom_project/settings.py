@@ -28,6 +28,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+SITE_ID = 1
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
+    'django.contrib.sites',
 
     # Custom Apps
     'core',
@@ -44,6 +48,7 @@ INSTALLED_APPS = [
     'products',
     'cart',
     'orders',
+    'coupons',
     'widget_tweaks',
 ]
 
@@ -146,3 +151,8 @@ CART_SESSION_ID = 'cart'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'LUXE. <noreply@luxeshop.com>'
+ADMIN_EMAIL = 'admin@luxeshop.com'

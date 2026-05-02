@@ -1,6 +1,8 @@
 from django.db import models
 from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
 from products.models import ProductVariant
+from coupons.models import Coupon
 
 class Order(models.Model):
     STATUS_CHOICES = (
@@ -8,6 +10,8 @@ class Order(models.Model):
         ('confirmed', 'Confirmée'),
         ('shipped', 'Expédiée'),
         ('delivered', 'Livrée'),
+        ('cancelled', 'Annulée'),
+        ('returned', 'Retournée'),
     )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     first_name = models.CharField(max_length=50)
@@ -25,12 +29,24 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    
+    # Coupon fields
+    coupon = models.ForeignKey(Coupon, related_name='orders', null=True, blank=True, on_delete=models.SET_NULL)
+    discount = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
 
     class Meta:
         ordering = ('-created_at',)
 
     def __str__(self):
         return f'Order {self.id}'
+
+    def cancel_order(self):
+        """Sets status to cancelled. Stock restoration is handled by signals."""
+        if self.status != 'cancelled':
+            self.status = 'cancelled'
+            self.save()
+            return True
+        return False
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
