@@ -17,8 +17,8 @@
             <p class="text-sm text-gray-600">{{ order.first_name }} {{ order.last_name }}</p>
             <p class="text-sm text-gray-600">{{ order.street }}</p>
             <p class="text-sm text-gray-600">{{ order.postal_code }} {{ order.city }}</p>
-            <p class="text-sm text-gray-600 mt-4"><strong class="uppercase text-brand-900">Méthode de paiement:</strong> À la livraison</p>
-            <p class="text-sm text-gray-600"><strong class="uppercase text-brand-900">Total à payer:</strong> {{ order.total_amount }} MAD</p>
+            <p class="text-sm text-gray-600 mt-4"><strong class="uppercase text-brand-900">Statut du paiement:</strong> {% if order.paid %}Payé avec succès{% else %}En attente{% endif %}</p>
+            <p class="text-sm text-gray-600"><strong class="uppercase text-brand-900">Total payé:</strong> {{ order.total_amount }} MAD</p>
         </div>
 
         <a href="{% url 'products:product_list' %}" class="inline-block bg-brand-900 text-white font-bold uppercase tracking-widest py-4 px-10 hover:bg-black transition duration-300">

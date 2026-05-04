@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Paiement Annulé | LUXE.{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex flex-col items-center justify-center bg-brand-50 py-16 px-4 text-center">
+    <div class="bg-white p-12 shadow-sm max-w-2xl w-full">
+        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </div>
+        
+        <h1 class="text-4xl font-extrabold text-brand-900 uppercase tracking-tight mb-4">Paiement Annulé</h1>
+        <p class="text-lg text-gray-500 mb-8 font-light">Le processus de paiement a été annulé. Aucune somme n'a été débitée de votre compte.</p>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'cart:cart_detail' %}" class="inline-block bg-brand-900 text-white font-bold uppercase tracking-widest py-4 px-10 hover:bg-black transition duration-300">
+                Réessayer le paiement
+            </a>
+            <a href="{% url 'products:product_list' %}" class="inline-block border border-brand-900 text-brand-900 font-bold uppercase tracking-widest py-4 px-10 hover:bg-brand-50 transition duration-300">
+                Continuer mes achats
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

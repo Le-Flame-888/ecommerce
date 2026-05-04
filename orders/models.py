@@ -29,6 +29,8 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    paid = models.BooleanField(default=False)
+    stripe_id = models.CharField(max_length=250, blank=True)
     
     # Coupon fields
     coupon = models.ForeignKey(Coupon, related_name='orders', null=True, blank=True, on_delete=models.SET_NULL)

@@ -1,9 +1,14 @@
-from django.shortcuts import render, redirect
+import stripe
+from django.conf import settings
+from django.urls import reverse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import OrderItem
+from .models import Order, OrderItem
 from .forms import OrderCreateForm
 from cart.cart import Cart
 from .emails import send_order_confirmation_email
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def checkout(request):
     cart = Cart(request)
@@ -25,6 +30,7 @@ def checkout(request):
             order.total_amount = cart.get_total_price_after_discount()
             order.save()
             
+            line_items = []
             for item in cart:
                 variant = item['variant']
                 OrderItem.objects.create(
@@ -33,18 +39,40 @@ def checkout(request):
                     price=item['price'],
                     quantity=item['quantity']
                 )
-                # Deduct stock
-                variant.stock -= item['quantity']
-                if variant.stock < 0:
-                    variant.stock = 0
-                variant.save()
+                # Prepare line item for Stripe
+                line_items.append({
+                    'price_data': {
+                        'currency': settings.STRIPE_CURRENCY,
+                        'unit_amount': int(item['price'] * 100),
+                        'product_data': {
+                            'name': variant.product.name,
+                        },
+                    },
+                    'quantity': item['quantity'],
+                })
             
-            # Send order confirmation email
-            send_order_confirmation_email(order)
+            # Create Stripe Checkout Session
+            success_url = request.build_absolute_uri(reverse('orders:payment_success')) + f'?order_id={order.id}'
+            cancel_url = request.build_absolute_uri(reverse('orders:payment_cancelled'))
             
-            cart.clear()
-            messages.success(request, f'Commande #{order.id} confirmée avec succès !')
-            return render(request, 'orders/success.html', {'order': order})
+            try:
+                session = stripe.checkout.Session.create(
+                    payment_method_types=['card'],
+                    line_items=line_items,
+                    mode='payment',
+                    success_url=success_url,
+                    cancel_url=cancel_url,
+                    client_reference_id=str(order.id),
+                )
+                order.stripe_id = session.id
+                order.save()
+                
+                cart.clear()
+                return redirect(session.url, code=303)
+            except Exception as e:
+                messages.error(request, f"Erreur de paiement : {str(e)}")
+                return redirect('orders:checkout')
+
     else:
         # Pre-fill form if user is authenticated and has a default address
         initial_data = {}
@@ -65,8 +93,37 @@ def checkout(request):
                 })
         form = OrderCreateForm(initial=initial_data)
         
+    return render(request, 'orders/checkout.html', {'cart': cart, 'form': form})
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+
+def payment_success(request):
+    order_id = request.GET.get('order_id')
+    order = get_object_or_404(Order, id=order_id)
+    
+    if not order.paid:
+        # Mark as paid
+        order.paid = True
+        order.status = 'confirmed'
+        order.save()
+        
+        # Deduct stock for all items
+        for item in order.items.all():
+            variant = item.variant
+            variant.stock -= item.quantity
+            if variant.stock < 0:
+                variant.stock = 0
+            variant.save()
+        
+        # Send confirmation email
+        send_order_confirmation_email(order)
+        
+    messages.success(request, f'Commande #{order.id} payée et confirmée avec succès !')
+    return render(request, 'orders/success.html', {'order': order})
+
+def payment_cancelled(request):
+    messages.warning(request, "Le paiement a été annulé.")
+    return render(request, 'orders/cancel.html')
 
 @login_required
 @require_POST
