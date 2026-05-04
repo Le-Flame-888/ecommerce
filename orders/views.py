@@ -18,6 +18,13 @@ def checkout(request):
     if request.method == 'POST':
         form = OrderCreateForm(request.POST)
         if form.is_valid():
+            # Pre-checkout stock check
+            for item in cart:
+                variant = item['variant']
+                if variant.stock < item['quantity']:
+                    messages.error(request, f"Désolé, le produit {variant.product.name} ({variant.size}/{variant.color}) n'a plus assez de stock (disponible: {variant.stock}).")
+                    return redirect('cart:cart_detail')
+
             order = form.save(commit=False)
             if request.user.is_authenticated:
                 order.user = request.user
@@ -97,27 +104,35 @@ def checkout(request):
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 
+from django.db import transaction
+from products.models import ProductVariant
+
 def payment_success(request):
     order_id = request.GET.get('order_id')
-    order = get_object_or_404(Order, id=order_id)
     
-    if not order.paid:
-        # Mark as paid
-        order.paid = True
-        order.status = 'confirmed'
-        order.save()
+    with transaction.atomic():
+        # Lock the order row to prevent simultaneous processing
+        order = get_object_or_404(Order.objects.select_for_update(), id=order_id)
         
-        # Deduct stock for all items
-        for item in order.items.all():
-            variant = item.variant
-            variant.stock -= item.quantity
-            if variant.stock < 0:
-                variant.stock = 0
-            variant.save()
-        
-        # Send confirmation email
-        send_order_confirmation_email(order)
-        
+        if not order.paid:
+            # Mark as paid
+            order.paid = True
+            order.status = 'confirmed'
+            order.save()
+            
+            # Deduct stock for all items using select_for_update to lock variants
+            for item in order.items.all():
+                if item.variant:
+                    # Lock the specific variant row
+                    variant = ProductVariant.objects.select_for_update().get(id=item.variant.id)
+                    variant.stock -= item.quantity
+                    if variant.stock < 0:
+                        variant.stock = 0
+                    variant.save()
+            
+            # Send confirmation email
+            send_order_confirmation_email(order)
+            
     messages.success(request, f'Commande #{order.id} payée et confirmée avec succès !')
     return render(request, 'orders/success.html', {'order': order})
 

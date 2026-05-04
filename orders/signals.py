@@ -8,20 +8,33 @@ from django.conf import settings
 
 from django.db.models.signals import post_save, pre_save
 
+from django.db import transaction
+from products.models import ProductVariant
+
 @receiver(pre_save, sender=Order)
 def restore_stock_on_cancellation(sender, instance, **kwargs):
     """
     Restore stock if an order status is changed to 'cancelled'.
     """
     if instance.id:
-        previous_status = Order.objects.get(id=instance.id).status
-        # Restore stock if moving to cancelled or returned from a non-restored state
-        if previous_status not in ['cancelled', 'returned'] and instance.status in ['cancelled', 'returned']:
-            for item in instance.items.all():
-                if item.variant:
-                    item.variant.stock += item.quantity
-                    item.variant.save()
-            print(f"DEBUG: Stock restored for Order #{instance.id} (Status: {instance.status})")
+        try:
+            # Use select_for_update on the order check if needed, 
+            # but more importantly on the variant restoration.
+            previous_order = Order.objects.get(id=instance.id)
+            previous_status = previous_order.status
+            
+            # Restore stock if moving to cancelled or returned from a non-restored state
+            if previous_status not in ['cancelled', 'returned'] and instance.status in ['cancelled', 'returned']:
+                with transaction.atomic():
+                    for item in instance.items.all():
+                        if item.variant:
+                            # Lock the variant row to prevent race conditions
+                            variant = ProductVariant.objects.select_for_update().get(id=item.variant.id)
+                            variant.stock += item.quantity
+                            variant.save()
+                    print(f"DEBUG: Stock restored for Order #{instance.id} (Status: {instance.status})")
+        except Order.DoesNotExist:
+            pass
 
 @receiver(post_save, sender=Order)
 def send_order_status_update_email(sender, instance, created, **kwargs):
