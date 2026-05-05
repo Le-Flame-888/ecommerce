@@ -2,14 +2,19 @@
 {% load static %}
 
 {% block title %}{{ product.name }} | LUXE.{% endblock %}
-{% block extra_meta %}
-<meta name="description" content="{{ product.description|truncatewords:20 }}">
-<meta property="og:title" content="{{ product.name }} | LUXE.">
-<meta property="og:description" content="{{ product.description|truncatewords:20 }}">
+{% block meta_description %}{{ product.description|truncatewords:20 }}{% endblock %}
+
+{% block og_title %}{{ product.name }} | LUXE.{% endblock %}
+{% block og_description %}{{ product.description|truncatewords:20 }}{% endblock %}
 {% if product.images.first %}
-<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.images.first.image.url }}">
+    {% block og_image %}{{ request.scheme }}://{{ request.get_host }}{{ product.images.first.image.url }}{% endblock %}
 {% endif %}
-{% endblock %}
+
+{% block twitter_title %}{{ product.name }} | LUXE.{% endblock %}
+{% block twitter_description %}{{ product.description|truncatewords:20 }}{% endblock %}
+{% if product.images.first %}
+    {% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{{ product.images.first.image.url }}{% endblock %}
+{% endif %}
 
 {% block content %}
 <div class="bg-white">
@@ -246,7 +251,8 @@
 </section>
 {% endif %}
 
-<!-- Structured Data (JSON-LD) -->
+{% block structured_data %}
+<!-- Product Structured Data (JSON-LD) -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org/",
@@ -280,6 +286,7 @@
   {% endif %}
 }
 </script>
+{% endblock %}
 
 <script>
 function updateQty(delta) {

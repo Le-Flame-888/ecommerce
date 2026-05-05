@@ -3,12 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="LUXE. - Découvrez notre collection exclusive de mode premium. Élégance, qualité et design minimaliste.">
+    <meta name="description" content="{% block meta_description %}LUXE. - Découvrez notre collection exclusive de mode premium. Élégance, qualité et design minimaliste.{% endblock %}">
     <meta name="keywords" content="mode, luxe, vêtements, premium, e-commerce">
-    <meta property="og:title" content="LUXE. | E-Commerce Premium">
-    <meta property="og:description" content="Découvrez notre collection exclusive de mode premium.">
+    
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:title" content="{% block og_title %}LUXE. | E-Commerce Premium{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Découvrez notre collection exclusive de mode premium.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/hero.png' %}{% endblock %}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.build_absolute_uri }}">
+    <meta property="twitter:title" content="{% block twitter_title %}LUXE. | E-Commerce Premium{% endblock %}">
+    <meta property="twitter:description" content="{% block twitter_description %}Découvrez notre collection exclusive de mode premium.{% endblock %}">
+    <meta property="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/hero.png' %}{% endblock %}">
+
     {% block extra_meta %}{% endblock %}
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "LUXE.",
+      "url": "{{ request.scheme }}://{{ request.get_host }}",
+      "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.png' %}",
+      "sameAs": [
+        "https://www.facebook.com/luxeshop",
+        "https://www.instagram.com/luxeshop"
+      ]
+    }
+    </script>
+    {% block structured_data %}{% endblock %}
     <title>{% block title %}LUXE. | E-Commerce Premium{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
