@@ -39,6 +39,10 @@ class Order(models.Model):
     class Meta:
         ordering = ('-created_at',)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._original_status = self.status
+
     def __str__(self):
         return f'Order {self.id}'
 

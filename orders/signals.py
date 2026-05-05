@@ -17,24 +17,16 @@ def restore_stock_on_cancellation(sender, instance, **kwargs):
     Restore stock if an order status is changed to 'cancelled'.
     """
     if instance.id:
-        try:
-            # Use select_for_update on the order check if needed, 
-            # but more importantly on the variant restoration.
-            previous_order = Order.objects.get(id=instance.id)
-            previous_status = previous_order.status
-            
-            # Restore stock if moving to cancelled or returned from a non-restored state
-            if previous_status not in ['cancelled', 'returned'] and instance.status in ['cancelled', 'returned']:
-                with transaction.atomic():
-                    for item in instance.items.all():
-                        if item.variant:
-                            # Lock the variant row to prevent race conditions
-                            variant = ProductVariant.objects.select_for_update().get(id=item.variant.id)
-                            variant.stock += item.quantity
-                            variant.save()
-                    print(f"DEBUG: Stock restored for Order #{instance.id} (Status: {instance.status})")
-        except Order.DoesNotExist:
-            pass
+        # Restore stock if moving to cancelled or returned from a non-restored state
+        if instance._original_status not in ['cancelled', 'returned'] and instance.status in ['cancelled', 'returned']:
+            with transaction.atomic():
+                for item in instance.items.all():
+                    if item.variant:
+                        # Lock the variant row to prevent race conditions
+                        variant = ProductVariant.objects.select_for_update().get(id=item.variant.id)
+                        variant.stock += item.quantity
+                        variant.save()
+                print(f"DEBUG: Stock restored for Order #{instance.id} (Status: {instance.status})")
 
 @receiver(post_save, sender=Order)
 def send_order_status_update_email(sender, instance, created, **kwargs):
@@ -42,10 +34,9 @@ def send_order_status_update_email(sender, instance, created, **kwargs):
     Send an email notification when an order status changes to 'shipped' or 'delivered'.
     """
     if not created:
-        # Check if status has changed
-        # Note: In a production environment, we'd compare the old status with the new one.
-        # For simplicity in this demo, we'll send it if status is 'shipped' or 'delivered'.
-        if instance.status in ['shipped', 'delivered']:
+        # Only send email if the status has actually changed
+        if instance.status != instance._original_status:
+            if instance.status in ['shipped', 'delivered']:
             subject = f'Mise à jour de votre commande #{instance.id} - LUXE.'
             
             # Choose specific message based on status
