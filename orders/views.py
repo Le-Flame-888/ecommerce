@@ -6,6 +6,8 @@ from django.contrib import messages
 from .models import Order, OrderItem
 from .forms import OrderCreateForm
 from cart.cart import Cart
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from .emails import send_order_confirmation_email
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -109,32 +111,59 @@ from products.models import ProductVariant
 
 def payment_success(request):
     order_id = request.GET.get('order_id')
-    
-    with transaction.atomic():
-        # Lock the order row to prevent simultaneous processing
-        order = get_object_or_404(Order.objects.select_for_update(), id=order_id)
-        
-        if not order.paid:
-            # Mark as paid
-            order.paid = True
-            order.status = 'confirmed'
-            order.save()
-            
-            # Deduct stock for all items using select_for_update to lock variants
-            for item in order.items.all():
-                if item.variant:
-                    # Lock the specific variant row
-                    variant = ProductVariant.objects.select_for_update().get(id=item.variant.id)
-                    variant.stock -= item.quantity
-                    if variant.stock < 0:
-                        variant.stock = 0
-                    variant.save()
-            
-            # Send confirmation email
-            send_order_confirmation_email(order)
-            
-    messages.success(request, f'Commande #{order.id} payée et confirmée avec succès !')
+    order = get_object_or_404(Order, id=order_id)
     return render(request, 'orders/success.html', {'order': order})
+
+@csrf_exempt
+def stripe_webhook(request):
+    payload = request.body
+    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
+    event = None
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+        )
+    except ValueError as e:
+        # Invalid payload
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        return HttpResponse(status=400)
+
+    # Handle the event
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        order_id = session.get('client_reference_id')
+        
+        if order_id:
+            try:
+                with transaction.atomic():
+                    # Lock the order row to prevent simultaneous processing
+                    order = Order.objects.select_for_update().get(id=order_id)
+                    
+                    if not order.paid:
+                        # Mark as paid
+                        order.paid = True
+                        order.status = 'confirmed'
+                        order.save()
+                        
+                        # Deduct stock for all items using select_for_update to lock variants
+                        for item in order.items.all():
+                            if item.variant:
+                                # Lock the specific variant row
+                                variant = ProductVariant.objects.select_for_update().get(id=item.variant.id)
+                                variant.stock -= item.quantity
+                                if variant.stock < 0:
+                                    variant.stock = 0
+                                variant.save()
+                        
+                        # Send confirmation email
+                        send_order_confirmation_email(order)
+            except Order.DoesNotExist:
+                return HttpResponse(status=404)
+
+    return HttpResponse(status=200)
 
 def payment_cancelled(request):
     messages.warning(request, "Le paiement a été annulé.")
