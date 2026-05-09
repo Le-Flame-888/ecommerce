@@ -37,24 +37,24 @@ def send_order_status_update_email(sender, instance, created, **kwargs):
         # Only send email if the status has actually changed
         if instance.status != instance._original_status:
             if instance.status in ['shipped', 'delivered']:
-            subject = f'Mise à jour de votre commande #{instance.id} - LUXE.'
-            
-            # Choose specific message based on status
-            status_text = "été expédiée" if instance.status == 'shipped' else "été livrée"
-            
-            context = {
-                'order': instance,
-                'status_text': status_text,
-            }
-            
-            html_message = render_to_string('orders/order_status_email.html', context)
-            plain_message = strip_tags(html_message)
-            
-            send_mail(
-                subject,
-                plain_message,
-                settings.DEFAULT_FROM_EMAIL,
-                [instance.email],
-                html_message=html_message,
-                fail_silently=False,
-            )
+                subject = f'Mise à jour de votre commande #{instance.id} - LUXE.'
+                
+                # Choose specific message based on status
+                status_text = "été expédiée" if instance.status == 'shipped' else "été livrée"
+                
+                context = {
+                    'order': instance,
+                    'status_text': status_text,
+                }
+                
+                html_message = render_to_string('orders/order_status_email.html', context)
+                plain_message = strip_tags(html_message)
+                
+                send_mail(
+                    subject,
+                    plain_message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [instance.email],
+                    html_message=html_message,
+                    fail_silently=False,
+                )

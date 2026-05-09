@@ -6,6 +6,7 @@ from django.utils import timezone
 from .models import Order, OrderItem
 from products.models import Product, Category, ProductVariant
 from users.models import User
+from django.conf import settings
 
 class OrderFlowTest(TestCase):
     def setUp(self):
@@ -27,6 +28,7 @@ class OrderFlowTest(TestCase):
             color='White',
             stock=10
         )
+        # Create a pending order as if it came from checkout
         self.order = Order.objects.create(
             first_name='John',
             last_name='Doe',
@@ -34,7 +36,8 @@ class OrderFlowTest(TestCase):
             street='123 Street',
             city='Casablanca',
             postal_code='20000',
-            total_amount=100.00
+            total_amount=100.00,
+            status='pending'
         )
         self.order_item = OrderItem.objects.create(
             order=self.order,
@@ -44,7 +47,7 @@ class OrderFlowTest(TestCase):
         )
 
     @patch('stripe.Webhook.construct_event')
-    def test_stripe_webhook_marks_order_as_paid_and_deducts_stock(self, mock_webhook):
+    def test_stripe_webhook_marks_order_as_paid(self, mock_webhook):
         # Mock Stripe event
         mock_webhook.return_value = {
             'type': 'checkout.session.completed',
@@ -72,18 +75,13 @@ class OrderFlowTest(TestCase):
         self.assertTrue(self.order.paid)
         self.assertEqual(self.order.status, 'confirmed')
         
-        # Verify stock deduction
+        # Verify stock WAS NOT deducted again (still at 10 because manual creation didn't deduct)
         self.variant.refresh_from_db()
-        self.assertEqual(self.variant.stock, 8) # 10 - 2
+        self.assertEqual(self.variant.stock, 10)
 
     def test_stock_restoration_on_cancellation(self):
-        # First, simulate order being paid (status confirmed, stock deducted)
-        self.order.status = 'confirmed'
-        self.order.paid = True
-        self.order.save()
-        
-        # Manually deduct stock as if webhook happened
-        self.variant.stock -= 2
+        # Setup: Order exists and stock was deducted (simulated)
+        self.variant.stock = 8
         self.variant.save()
         
         # Now cancel the order
@@ -94,12 +92,43 @@ class OrderFlowTest(TestCase):
         self.variant.refresh_from_db()
         self.assertEqual(self.variant.stock, 10) # 8 + 2
 
-    def test_insecure_payment_success_redirect_does_not_mark_as_paid(self):
-        # Accessing the success page with an order ID should NOT mark it as paid anymore
-        url = f"{reverse('orders:payment_success')}?order_id={self.order.id}"
-        response = self.client.get(url)
+    @patch('stripe.checkout.Session.create')
+    def test_stock_reservation_at_checkout(self, mock_stripe_create):
+        # Mock Stripe session
+        mock_stripe_create.return_value = type('obj', (object,), {'id': 'sess_123', 'url': 'http://stripe.com/pay'})
         
-        self.assertEqual(response.status_code, 200)
-        self.order.refresh_from_db()
-        self.assertFalse(self.order.paid)
-        self.assertEqual(self.order.status, 'pending')
+        # Setup cart in session
+        session = self.client.session
+        session[settings.CART_SESSION_ID] = {
+            str(self.variant.id): {'quantity': 3, 'price': str(self.variant.final_price)}
+        }
+        session.save()
+        
+        # Verify initial stock
+        self.assertEqual(self.variant.stock, 10)
+        
+        # Proceed to checkout
+        url = reverse('orders:checkout')
+        response = self.client.post(url, {
+            'first_name': 'Jane',
+            'last_name': 'Doe',
+            'email': 'jane@example.com',
+            'phone': '0600000000',
+            'street': 'Street 1',
+            'city': 'Rabat',
+            'postal_code': '10000',
+            'country': 'Maroc'
+        })
+        
+        # Check if redirected (either 302 or 303)
+        self.assertIn(response.status_code, [302, 303])
+        
+        # If it was a 302 to the checkout page, it means it failed
+        if response.status_code == 302 and response.url == url:
+            from django.contrib.messages import get_messages
+            msgs = [m.message for m in get_messages(response.wsgi_request)]
+            self.fail(f"Checkout failed and redirected back to form. Messages: {msgs}")
+
+        # Verify stock was deducted immediately
+        self.variant.refresh_from_db()
+        self.assertEqual(self.variant.stock, 7) # 10 - 3

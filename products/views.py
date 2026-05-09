@@ -80,7 +80,8 @@ def product_detail(request, slug):
         category=product.category, is_active=True
     ).exclude(id=product.id).prefetch_related('images')[:4]
     
-    reviews = product.reviews.all()
+    # Only show approved reviews
+    reviews = product.reviews.filter(is_approved=True)
     
     if request.method == 'POST' and request.user.is_authenticated:
         # Check if user already reviewed this product
@@ -93,8 +94,9 @@ def product_detail(request, slug):
             review = form.save(commit=False)
             review.product = product
             review.user = request.user
+            # review.is_approved = False  # Default is False in model, explicitly set if needed
             review.save()
-            messages.success(request, "Merci pour votre avis !")
+            messages.success(request, "Merci ! Votre avis a été soumis et sera visible après approbation par un modérateur.")
             return redirect('products:product_detail', slug=slug)
     else:
         form = ReviewForm()

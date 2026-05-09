@@ -10,9 +10,38 @@
         <div class="flex flex-col lg:flex-row gap-8">
             <!-- Checkout Form -->
             <div class="flex-grow bg-white p-8 shadow-sm">
+                {% if user.is_authenticated and addresses %}
+                <div class="mb-10">
+                    <h2 class="text-lg font-bold text-brand-900 uppercase tracking-wider mb-6 border-b border-gray-200 pb-2">Vos adresses enregistrées</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for address in addresses %}
+                        <div class="border p-4 cursor-pointer hover:border-brand-900 transition-colors relative group address-card" 
+                             data-street="{{ address.street }}"
+                             data-city="{{ address.city }}"
+                             data-postal="{{ address.postal_code }}"
+                             data-country="{{ address.country }}">
+                            <div class="flex justify-between items-start">
+                                <p class="text-sm font-bold uppercase tracking-tight">{{ address.city }}</p>
+                                {% if address.is_default %}
+                                <span class="text-[10px] bg-brand-900 text-white px-2 py-0.5 uppercase font-bold">Défaut</span>
+                                {% endif %}
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">{{ address.street }}</p>
+                            <p class="text-sm text-gray-600">{{ address.postal_code }}</p>
+                            <p class="text-sm text-gray-400 uppercase text-xs mt-2">{{ address.country }}</p>
+                            
+                            <div class="absolute inset-0 bg-brand-900/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                                <span class="text-xs font-bold uppercase text-brand-900 bg-white px-3 py-1 shadow-sm">Utiliser cette adresse</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
                 <h2 class="text-lg font-bold text-brand-900 uppercase tracking-wider mb-6 border-b border-gray-200 pb-2">Informations de livraison</h2>
                 
-                <form method="post" class="space-y-6">
+                <form method="post" id="checkout-form" class="space-y-6">
                     {% csrf_token %}
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -76,7 +105,7 @@
             </div>
 
             <!-- Order Summary -->
-            <div class="w-full lg:w-96 bg-gray-50 p-6 shadow-sm border border-gray-200 h-fit">
+            <div class="w-full lg:w-96 bg-gray-50 p-6 shadow-sm border border-gray-200 h-fit sticky top-24">
                 <h2 class="text-lg font-bold text-brand-900 uppercase tracking-wider mb-6 border-b border-gray-200 pb-4">Résumé</h2>
                 
                 <ul class="divide-y divide-gray-200 mb-6">
@@ -116,4 +145,33 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const cards = document.querySelectorAll('.address-card');
+        const streetInput = document.querySelector('input[name="street"]');
+        const cityInput = document.querySelector('input[name="city"]');
+        const postalInput = document.querySelector('input[name="postal_code"]');
+        const countryInput = document.querySelector('input[name="country"]');
+
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                // Visual feedback
+                cards.forEach(c => c.classList.remove('border-brand-900', 'ring-1', 'ring-brand-900'));
+                card.classList.add('border-brand-900', 'ring-1', 'ring-brand-900');
+
+                // Fill form
+                if (streetInput) streetInput.value = card.dataset.street;
+                if (cityInput) cityInput.value = card.dataset.city;
+                if (postalInput) postalInput.value = card.dataset.postal;
+                if (countryInput) countryInput.value = card.dataset.country;
+
+                // Optional: Scroll to form on mobile
+                if (window.innerWidth < 1024) {
+                    document.getElementById('checkout-form').scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

@@ -37,32 +37,48 @@ def checkout(request):
                 order.discount = cart.coupon.discount
             
             order.total_amount = cart.get_total_price_after_discount()
-            order.save()
             
             line_items = []
-            for item in cart:
-                variant = item['variant']
-                OrderItem.objects.create(
-                    order=order,
-                    variant=variant,
-                    price=item['price'],
-                    quantity=item['quantity']
-                )
-                # Prepare line item for Stripe
-                line_items.append({
-                    'price_data': {
-                        'currency': settings.STRIPE_CURRENCY,
-                        'unit_amount': int(item['price'] * 100),
-                        'product_data': {
-                            'name': variant.product.name,
-                        },
-                    },
-                    'quantity': item['quantity'],
-                })
+            try:
+                with transaction.atomic():
+                    order.save()
+                    for item in cart:
+                        variant = ProductVariant.objects.select_for_update().get(id=item['variant'].id)
+                        
+                        # Double check stock inside the transaction
+                        if variant.stock < item['quantity']:
+                            raise ValueError(f"Désolé, le produit {variant.product.name} n'a plus assez de stock.")
+                        
+                        variant.stock -= item['quantity']
+                        variant.save()
+                        
+                        OrderItem.objects.create(
+                            order=order,
+                            variant=variant,
+                            price=item['price'],
+                            quantity=item['quantity']
+                        )
+                        # Prepare line item for Stripe
+                        line_items.append({
+                            'price_data': {
+                                'currency': settings.STRIPE_CURRENCY,
+                                'unit_amount': int(item['price'] * 100),
+                                'product_data': {
+                                    'name': variant.product.name,
+                                },
+                            },
+                            'quantity': item['quantity'],
+                        })
+            except ValueError as e:
+                messages.error(request, str(e))
+                return redirect('cart:cart_detail')
+            except Exception as e:
+                messages.error(request, f"Une erreur est survenue : {str(e)}")
+                return redirect('orders:checkout')
             
             # Create Stripe Checkout Session
             success_url = request.build_absolute_uri(reverse('orders:payment_success')) + f'?order_id={order.id}'
-            cancel_url = request.build_absolute_uri(reverse('orders:payment_cancelled'))
+            cancel_url = request.build_absolute_uri(reverse('orders:payment_cancelled')) + f'?order_id={order.id}'
             
             try:
                 session = stripe.checkout.Session.create(
@@ -101,8 +117,16 @@ def checkout(request):
                     'country': address.country,
                 })
         form = OrderCreateForm(initial=initial_data)
+    
+    addresses = []
+    if request.user.is_authenticated:
+        addresses = request.user.addresses.all()
         
-    return render(request, 'orders/checkout.html', {'cart': cart, 'form': form})
+    return render(request, 'orders/checkout.html', {
+        'cart': cart, 
+        'form': form,
+        'addresses': addresses
+    })
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 
@@ -148,15 +172,8 @@ def stripe_webhook(request):
                         order.status = 'confirmed'
                         order.save()
                         
-                        # Deduct stock for all items using select_for_update to lock variants
-                        for item in order.items.all():
-                            if item.variant:
-                                # Lock the specific variant row
-                                variant = ProductVariant.objects.select_for_update().get(id=item.variant.id)
-                                variant.stock -= item.quantity
-                                if variant.stock < 0:
-                                    variant.stock = 0
-                                variant.save()
+                        # Stock was already deducted at checkout to reserve it
+                        # No need to deduct again here.
                         
                         # Send confirmation email
                         send_order_confirmation_email(order)
@@ -166,7 +183,20 @@ def stripe_webhook(request):
     return HttpResponse(status=200)
 
 def payment_cancelled(request):
-    messages.warning(request, "Le paiement a été annulé.")
+    order_id = request.GET.get('order_id')
+    if order_id:
+        try:
+            order = Order.objects.get(id=order_id)
+            if order.status == 'pending':
+                order.cancel_order()
+                messages.warning(request, "Le paiement a été annulé et votre réservation de stock a été libérée.")
+            else:
+                messages.warning(request, "Le paiement a été annulé.")
+        except Order.DoesNotExist:
+            messages.warning(request, "Le paiement a été annulé.")
+    else:
+        messages.warning(request, "Le paiement a été annulé.")
+        
     return render(request, 'orders/cancel.html')
 
 @login_required

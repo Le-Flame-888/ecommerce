@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+{% load static %}
+{% load i18n %}
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="{% block meta_description %}LUXE. - Découvrez notre collection exclusive de mode premium. Élégance, qualité et design minimaliste.{% endblock %}">
-    <meta name="keywords" content="mode, luxe, vêtements, premium, e-commerce">
+    <meta name="description" content="{% block meta_description %}{% trans "LUXE. - Découvrez notre collection exclusive de mode premium. Élégance, qualité et design minimaliste." %}{% endblock %}">
+    <meta name="keywords" content="{% trans "mode, luxe, vêtements, premium, e-commerce" %}">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    <meta property="og:title" content="{% block og_title %}LUXE. | E-Commerce Premium{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}Découvrez notre collection exclusive de mode premium.{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{% trans "LUXE. | E-Commerce Premium" %}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{% trans "Découvrez notre collection exclusive de mode premium." %}{% endblock %}">
     <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/hero.png' %}{% endblock %}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ request.build_absolute_uri }}">
-    <meta property="twitter:title" content="{% block twitter_title %}LUXE. | E-Commerce Premium{% endblock %}">
-    <meta property="twitter:description" content="{% block twitter_description %}Découvrez notre collection exclusive de mode premium.{% endblock %}">
+    <meta property="twitter:title" content="{% block twitter_title %}{% trans "LUXE. | E-Commerce Premium" %}{% endblock %}">
+    <meta property="twitter:description" content="{% block twitter_description %}{% trans "Découvrez notre collection exclusive de mode premium." %}{% endblock %}">
     <meta property="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/hero.png' %}{% endblock %}">
 
     {% block extra_meta %}{% endblock %}
@@ -37,7 +39,7 @@
     }
     </script>
     {% block structured_data %}{% endblock %}
-    <title>{% block title %}LUXE. | E-Commerce Premium{% endblock %}</title>
+    <title>{% block title %}{% trans "LUXE. | E-Commerce Premium" %}{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -121,9 +123,9 @@
                 </div>
                 <!-- Center Menu -->
                 <div class="hidden md:flex space-x-8">
-                    <a href="/" class="nav-link text-sm font-semibold tracking-wide uppercase text-gray-900">Nouveautés</a>
-                    <a href="/products/" class="nav-link text-sm font-semibold tracking-wide uppercase text-gray-900">Boutique</a>
-                    <a href="{% url 'contact' %}" class="nav-link text-sm font-semibold tracking-wide uppercase text-gray-900">Contact</a>
+                    <a href="/" class="nav-link text-sm font-semibold tracking-wide uppercase text-gray-900">{% trans "Nouveautés" %}</a>
+                    <a href="/products/" class="nav-link text-sm font-semibold tracking-wide uppercase text-gray-900">{% trans "Boutique" %}</a>
+                    <a href="{% url 'contact' %}" class="nav-link text-sm font-semibold tracking-wide uppercase text-gray-900">{% trans "Contact" %}</a>
                 </div>
                 <!-- Icons -->
                 <div class="flex items-center space-x-6">
@@ -135,7 +137,7 @@
                     
                     <!-- Search Form -->
                     <form action="{% url 'products:product_list' %}" method="get" class="hidden md:flex items-center relative">
-                        <input type="text" name="q" placeholder="Rechercher..." class="w-32 lg:w-48 text-sm border-b border-gray-300 focus:border-brand-900 outline-none bg-transparent px-2 py-1 placeholder-gray-400 transition-all !border-x-0 !border-t-0 !px-0">
+                        <input type="text" name="q" placeholder="{% trans "Rechercher..." %}" class="w-32 lg:w-48 text-sm border-b border-gray-300 focus:border-brand-900 outline-none bg-transparent px-2 py-1 placeholder-gray-400 transition-all !border-x-0 !border-t-0 !px-0">
                         <button type="submit" class="absolute right-0 text-gray-900 hover:text-gray-600 transition">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </button>
@@ -165,9 +167,9 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-100 absolute w-full shadow-lg">
             <div class="px-4 pt-2 pb-6 space-y-2">
-                <a href="/" class="block px-3 py-3 text-sm font-semibold tracking-wide uppercase text-gray-900 hover:bg-brand-50 transition border-b border-gray-50">Nouveautés</a>
-                <a href="/products/" class="block px-3 py-3 text-sm font-semibold tracking-wide uppercase text-gray-900 hover:bg-brand-50 transition border-b border-gray-50">Boutique</a>
-                <a href="{% url 'contact' %}" class="block px-3 py-3 text-sm font-semibold tracking-wide uppercase text-gray-900 hover:bg-brand-50 transition">Contact</a>
+                <a href="/" class="block px-3 py-3 text-sm font-semibold tracking-wide uppercase text-gray-900 hover:bg-brand-50 transition border-b border-gray-50">{% trans "Nouveautés" %}</a>
+                <a href="/products/" class="block px-3 py-3 text-sm font-semibold tracking-wide uppercase text-gray-900 hover:bg-brand-50 transition border-b border-gray-50">{% trans "Boutique" %}</a>
+                <a href="{% url 'contact' %}" class="block px-3 py-3 text-sm font-semibold tracking-wide uppercase text-gray-900 hover:bg-brand-50 transition">{% trans "Contact" %}</a>
             </div>
         </div>
     </nav>
@@ -192,27 +194,45 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
                 <h3 class="text-xl font-bold tracking-widest uppercase mb-4">LUXE.</h3>
-                <p class="text-gray-400 text-sm">L'élégance redéfinie. Découvrez notre dernière collection de mode premium.</p>
+                <p class="text-gray-400 text-sm">{% trans "L'élégance redéfinie. Découvrez notre dernière collection de mode premium." %}</p>
+                
+                <!-- Language Switcher -->
+                <div class="mt-6 flex items-center space-x-4">
+                    <form action="{% url 'set_language' %}" method="post" class="flex items-center">
+                        {% csrf_token %}
+                        <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                        <select name="language" onchange="this.form.submit()" class="bg-transparent border border-gray-700 text-xs font-bold uppercase py-1 px-2 focus:ring-0 focus:border-white transition cursor-pointer">
+                            {% get_current_language as LANGUAGE_CODE %}
+                            {% get_available_languages as LANGUAGES %}
+                            {% get_language_info_list for LANGUAGES as languages %}
+                            {% for language in languages %}
+                                <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %}selected{% endif %} class="bg-brand-900 text-white">
+                                    {{ language.name_local }} ({{ language.code }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
             </div>
             <div>
-                <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">Boutique</h4>
+                <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">{% trans "Boutique" %}</h4>
                 <ul class="space-y-2 text-sm text-gray-400">
-                    <li><a href="/products/" class="hover:text-white transition">Tous les produits</a></li>
-                    <li><a href="/" class="hover:text-white transition">Nouveautés</a></li>
+                    <li><a href="/products/" class="hover:text-white transition">{% trans "Tous les produits" %}</a></li>
+                    <li><a href="/" class="hover:text-white transition">{% trans "Nouveautés" %}</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">Assistance</h4>
+                <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">{% trans "Assistance" %}</h4>
                 <ul class="space-y-2 text-sm text-gray-400">
-                    <li><a href="{% url 'contact' %}" class="hover:text-white transition">Contactez-nous</a></li>
-                    <li><a href="{% url 'contact' %}" class="hover:text-white transition">FAQ</a></li>
+                    <li><a href="{% url 'contact' %}" class="hover:text-white transition">{% trans "Contactez-nous" %}</a></li>
+                    <li><a href="{% url 'contact' %}" class="hover:text-white transition">{% trans "FAQ" %}</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">Newsletter</h4>
+                <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">{% trans "Newsletter" %}</h4>
                 <form action="{% url 'newsletter_signup' %}" method="post" class="flex border-b border-gray-700 pb-2">
                     {% csrf_token %}
-                    <input type="email" name="email" placeholder="Votre email" required class="bg-transparent border-none outline-none w-full text-sm text-white placeholder-gray-500 !border-0 !p-0">
+                    <input type="email" name="email" placeholder="{% trans "Votre email" %}" required class="bg-transparent border-none outline-none w-full text-sm text-white placeholder-gray-500 !border-0 !p-0">
                     <button type="submit" class="text-sm font-bold uppercase hover:text-gray-300 transition">OK</button>
                 </form>
             </div>

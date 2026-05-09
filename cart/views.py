@@ -3,6 +3,7 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from products.models import ProductVariant
 from .cart import Cart
+from django.utils.translation import gettext as _
 
 @require_POST
 def cart_add(request):
@@ -13,13 +14,13 @@ def cart_add(request):
         quantity = int(request.POST.get('quantity', 1))
         # Stock validation
         if variant.stock <= 0:
-            messages.error(request, f'Désolé, "{variant.product.name} ({variant.size})" est en rupture de stock.')
+            messages.error(request, _('Sorry, "%(name)s (%(size)s)" is out of stock.') % {'name': variant.product.name, 'size': variant.size})
             return redirect('cart:cart_detail')
         if quantity > variant.stock:
-            messages.warning(request, f'Stock limité : seulement {variant.stock} unité(s) disponible(s) pour "{variant.product.name} ({variant.size})".')
+            messages.warning(request, _('Limited stock: only %(stock)d unit(s) available for "%(name)s (%(size)s)".') % {'stock': variant.stock, 'name': variant.product.name, 'size': variant.size})
             quantity = variant.stock
         cart.add(variant=variant, quantity=quantity)
-        messages.success(request, f'"{variant.product.name} ({variant.size})" ajouté au panier.')
+        messages.success(request, _('"%(name)s (%(size)s)" added to cart.') % {'name': variant.product.name, 'size': variant.size})
     return redirect('cart:cart_detail')
 
 @require_POST
@@ -28,7 +29,7 @@ def cart_update(request, variant_id):
     variant = get_object_or_404(ProductVariant, id=variant_id)
     quantity = int(request.POST.get('quantity', 1))
     if quantity > variant.stock:
-        messages.warning(request, f'Stock limité : seulement {variant.stock} unité(s) disponible(s).')
+        messages.warning(request, _('Limited stock: only %(stock)d unit(s) available.') % {'stock': variant.stock})
         quantity = variant.stock
     if quantity < 1:
         quantity = 1
@@ -40,7 +41,7 @@ def cart_remove(request, variant_id):
     cart = Cart(request)
     variant = get_object_or_404(ProductVariant, id=variant_id)
     cart.remove(variant)
-    messages.success(request, f'"{variant.product.name}" retiré du panier.')
+    messages.success(request, _('"%(name)s" removed from cart.') % {'name': variant.product.name})
     return redirect('cart:cart_detail')
 
 from coupons.forms import CouponApplyForm

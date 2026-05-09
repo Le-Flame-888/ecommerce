@@ -28,9 +28,20 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('product', 'user', 'rating', 'created_at')
-    list_filter = ('rating', 'created_at')
+    list_display = ('product', 'user', 'rating', 'is_approved', 'created_at')
+    list_filter = ('is_approved', 'rating', 'created_at')
     search_fields = ('product__name', 'user__username', 'comment')
+    actions = ['approve_reviews', 'reject_reviews']
+
+    def approve_reviews(self, request, queryset):
+        queryset.update(is_approved=True)
+        self.message_user(request, "Les avis sélectionnés ont été approuvés.")
+    approve_reviews.short_description = "Approuver les avis"
+
+    def reject_reviews(self, request, queryset):
+        queryset.update(is_approved=False)
+        self.message_user(request, "Les avis sélectionnés ont été rejetés.")
+    reject_reviews.short_description = "Rejeter (Désapprouver) les avis"
 
 @admin.register(ProductVariant)
 class ProductVariantAdmin(admin.ModelAdmin):

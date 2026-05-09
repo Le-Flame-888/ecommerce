@@ -6,6 +6,7 @@ from django.views.decorators.http import require_POST
 from django.http import HttpResponse
 from products.models import Product, Category
 from .models import Newsletter
+from django.utils.translation import gettext as _
 
 def home(request):
     featured_products = Product.objects.filter(is_active=True).order_by('-id')[:8]
@@ -23,7 +24,7 @@ def contact(request):
         message_text = request.POST.get('message', '')
         
         # Send email to admin
-        full_message = f"Message de {name} ({email}):\n\n{message_text}"
+        full_message = _("Message from %(name)s (%(email)s):\n\n%(message)s") % {'name': name, 'email': email, 'message': message_text}
         send_mail(
             f"Contact Form: {subject_text}",
             full_message,
@@ -32,7 +33,7 @@ def contact(request):
             fail_silently=False,
         )
         
-        messages.success(request, 'Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.')
+        messages.success(request, _('Your message has been sent successfully! We will get back to you as soon as possible.'))
         return render(request, 'core/contact.html', {'sent': True})
     
     return render(request, 'core/contact.html')
@@ -42,12 +43,12 @@ def newsletter_signup(request):
     email = request.POST.get('email')
     if email:
         if Newsletter.objects.filter(email=email).exists():
-            messages.warning(request, "Vous êtes déjà inscrit à notre newsletter.")
+            messages.warning(request, _("You are already subscribed to our newsletter."))
         else:
             Newsletter.objects.create(email=email)
-            messages.success(request, "Merci ! Vous êtes maintenant inscrit à la newsletter LUXE.")
+            messages.success(request, _("Thank you! You are now subscribed to the LUXE. newsletter."))
     else:
-        messages.error(request, "Veuillez entrer une adresse email valide.")
+        messages.error(request, _("Please enter a valid email address."))
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 def robots_txt(request):

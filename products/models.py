@@ -1,15 +1,17 @@
 from django.db import models
 from django.utils.text import slugify
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(_('name'), max_length=100)
     slug = models.SlugField(unique=True, blank=True)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subcategories')
-    image = models.ImageField(upload_to='categories/', null=True, blank=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subcategories', verbose_name=_('parent category'))
+    image = models.ImageField(_('image'), upload_to='categories/', null=True, blank=True)
 
     class Meta:
-        verbose_name_plural = 'Categories'
+        verbose_name = _('category')
+        verbose_name_plural = _('categories')
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -26,14 +28,18 @@ class Category(models.Model):
         return self.name
 
 class Product(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(_('name'), max_length=255)
     slug = models.SlugField(unique=True, blank=True)
-    description = models.TextField()
-    base_price = models.DecimalField(max_digits=10, decimal_places=2)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    description = models.TextField(_('description'))
+    base_price = models.DecimalField(_('base price'), max_digits=10, decimal_places=2)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', verbose_name=_('category'))
+    is_active = models.BooleanField(_('is active'), default=True)
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+
+    class Meta:
+        verbose_name = _('product')
+        verbose_name_plural = _('products')
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -48,20 +54,24 @@ class Product(models.Model):
         return self.name
 
     def get_average_rating(self):
-        reviews = self.reviews.all()
+        reviews = self.reviews.filter(is_approved=True)
         if not reviews:
             return 0
         return sum([review.rating for review in reviews]) / reviews.count()
 
     def get_review_count(self):
-        return self.reviews.count()
+        return self.reviews.filter(is_approved=True).count()
 
 class ProductVariant(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
-    size = models.CharField(max_length=50)
-    color = models.CharField(max_length=50)
-    stock = models.PositiveIntegerField(default=0)
-    price_modifier = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Amount added to base price")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants', verbose_name=_('product'))
+    size = models.CharField(_('size'), max_length=50)
+    color = models.CharField(_('color'), max_length=50)
+    stock = models.PositiveIntegerField(_('stock'), default=0)
+    price_modifier = models.DecimalField(_('price modifier'), max_digits=10, decimal_places=2, default=0.00, help_text=_("Amount added to base price"))
+
+    class Meta:
+        verbose_name = _('product variant')
+        verbose_name_plural = _('product variants')
 
     def __str__(self):
         return f"{self.product.name} - {self.size} / {self.color}"
@@ -71,22 +81,29 @@ class ProductVariant(models.Model):
         return self.product.base_price + self.price_modifier
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='products/')
-    alt_text = models.CharField(max_length=255, blank=True, null=True)
-    is_main = models.BooleanField(default=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images', verbose_name=_('product'))
+    image = models.ImageField(_('image'), upload_to='products/')
+    alt_text = models.CharField(_('alt text'), max_length=255, blank=True, null=True)
+    is_main = models.BooleanField(_('is main'), default=False)
+
+    class Meta:
+        verbose_name = _('product image')
+        verbose_name_plural = _('product images')
 
     def __str__(self):
         return f"Image for {self.product.name}"
 
 class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews')
-    rating = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 6)])
-    comment = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews', verbose_name=_('product'))
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews', verbose_name=_('user'))
+    rating = models.PositiveSmallIntegerField(_('rating'), choices=[(i, i) for i in range(1, 6)])
+    comment = models.TextField(_('comment'))
+    is_approved = models.BooleanField(_('is approved'), default=False)
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
 
     class Meta:
+        verbose_name = _('review')
+        verbose_name_plural = _('reviews')
         ordering = ['-created_at']
         unique_together = ('product', 'user') # One review per user per product
 

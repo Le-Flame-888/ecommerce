@@ -8,6 +8,7 @@ from products.models import Product
 
 from django.core.mail import send_mail
 from django.conf import settings
+from django.utils.translation import gettext as _
 
 def register(request):
     if request.user.is_authenticated:
@@ -21,8 +22,8 @@ def register(request):
             # Send Welcome Email
             try:
                 send_mail(
-                    'Bienvenue chez LUXE. !',
-                    f'Bonjour {user.username},\n\nMerci d\'avoir rejoint LUXE. ! Nous sommes ravis de vous compter parmi nos membres.\n\nCommencez à explorer nos collections dès maintenant : http://127.0.0.1:8000/products/\n\nL\'équipe LUXE.',
+                    _('Welcome to LUXE.!'),
+                    _('Hello %(username)s,\n\nThank you for joining LUXE.! We are delighted to have you as a member.\n\nStart exploring our collections now: http://127.0.0.1:8000/products/\n\nThe LUXE. team') % {'username': user.username},
                     settings.DEFAULT_FROM_EMAIL,
                     [user.email],
                     fail_silently=True,
@@ -31,7 +32,7 @@ def register(request):
                 pass
                 
             login(request, user)
-            messages.success(request, f'Bienvenue {user.username} ! Votre compte a été créé.')
+            messages.success(request, _('Welcome %(username)s! Your account has been created.') % {'username': user.username})
             return redirect('/')
     else:
         form = CustomUserCreationForm()
@@ -48,7 +49,7 @@ def profile(request):
             if not addresses.exists():
                 address.is_default = True
             address.save()
-            messages.success(request, 'Adresse ajoutée avec succès.')
+            messages.success(request, _('Address added successfully.'))
             return redirect('users:profile')
     else:
         address_form = AddressForm()
@@ -68,8 +69,8 @@ def toggle_wishlist(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     if product in request.user.wishlist.all():
         request.user.wishlist.remove(product)
-        messages.success(request, f'"{product.name}" retiré des favoris.')
+        messages.success(request, _('"%(name)s" removed from wishlist.') % {'name': product.name})
     else:
         request.user.wishlist.add(product)
-        messages.success(request, f'"{product.name}" ajouté aux favoris !')
+        messages.success(request, _('"%(name)s" added to wishlist!') % {'name': product.name})
     return redirect(request.META.get('HTTP_REFERER', 'products:product_list'))
