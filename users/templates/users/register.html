@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
+{% load socialaccount %}
 {% block title %}Créer un compte | LUXE.{% endblock %}
 
 {% block content %}
@@ -31,6 +32,34 @@
                 </button>
             </div>
         </form>
+
+        <!-- Social Register Divider -->
+        <div class="mt-8 relative">
+            <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                <div class="w-full border-t border-gray-200"></div>
+            </div>
+            <div class="relative flex justify-center text-xs uppercase font-bold tracking-widest">
+                <span class="px-3 bg-white text-gray-400">Ou s'inscrire avec</span>
+            </div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-2 gap-4">
+            <a href="{% provider_login_url 'google' %}" class="w-full inline-flex justify-center py-3 px-4 border border-gray-300 shadow-sm bg-white text-sm font-bold text-gray-700 hover:bg-gray-50 transition uppercase tracking-widest">
+                <span class="sr-only">Google</span>
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.908 3.152-1.928 4.172-1.2 1.2-3.04 2.48-6.12 2.48-4.908 0-8.88-3.972-8.88-8.88 0-4.908 3.972-8.88 8.88-8.88 2.66 0 4.6 1.04 6.02 2.4l2.3-2.3C18.42 1.04 15.68 0 12.48 0 6.1 0 1.22 5.12 1.22 11.5s4.88 11.5 11.26 11.5c3.42 0 6.02-1.12 8.04-3.22 2.08-2.08 2.74-4.98 2.74-7.34 0-.7-.06-1.36-.18-1.96H12.48v.02z"/>
+                </svg>
+                Google
+            </a>
+
+            <a href="{% provider_login_url 'facebook' %}" class="w-full inline-flex justify-center py-3 px-4 border border-gray-300 shadow-sm bg-white text-sm font-bold text-gray-700 hover:bg-gray-50 transition uppercase tracking-widest">
+                <span class="sr-only">Facebook</span>
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                Facebook
+            </a>
+        </div>
         
         <div class="mt-6 text-center">
             <p class="text-sm text-gray-500">Vous avez déjà un compte ? <a href="{% url 'users:login' %}" class="font-bold text-brand-900 hover:underline">Connectez-vous</a></p>

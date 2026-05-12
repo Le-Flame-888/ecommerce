@@ -1,0 +1,34 @@
+{% extends "admin/login.html" %}
+{% load i18n static socialaccount %}
+
+{% block extrastyle %}
+{{ block.super }}
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    #login-form { margin-top: 20px; }
+    .submit-row { margin-bottom: 20px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="p-4 bg-white border-b border-gray-100 mb-4 rounded shadow-sm">
+    <p class="text-sm font-bold uppercase tracking-widest text-gray-400 mb-4 text-center">Staff Social Login</p>
+    <a href="{% provider_login_url 'google' next='/admin/' %}" class="flex items-center justify-center bg-white border border-gray-300 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50 transition shadow-sm uppercase tracking-widest">
+        <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+            <path fill="#EA4335" d="M12.48 10.92v3.28h7.84c-.24 1.84-.908 3.152-1.928 4.172-1.2 1.2-3.04 2.48-6.12 2.48-4.908 0-8.88-3.972-8.88-8.88 0-4.908 3.972-8.88 8.88-8.88 2.66 0 4.6 1.04 6.02 2.4l2.3-2.3C18.42 1.04 15.68 0 12.48 0 6.1 0 1.22 5.12 1.22 11.5s4.88 11.5 11.26 11.5c3.42 0 6.02-1.12 8.04-3.22 2.08-2.08 2.74-4.98 2.74-7.34 0-.7-.06-1.36-.18-1.96H12.48v.02z"/>
+        </svg>
+        Se connecter avec Google
+    </a>
+</div>
+
+<div class="relative mb-8">
+    <div class="absolute inset-0 flex items-center" aria-hidden="true">
+        <div class="w-full border-t border-gray-200"></div>
+    </div>
+    <div class="relative flex justify-center text-xs uppercase font-bold tracking-widest">
+        <span class="px-2 bg-gray-50 text-gray-400">Ou identifiants classiques</span>
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}

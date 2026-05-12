@@ -92,79 +92,88 @@
                         </select>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-10 gap-x-6 xl:gap-x-8">
-                    {% for product in products %}
-                    <div class="group relative">
-                        <a href="{% url 'products:product_detail' product.slug %}" class="block">
-                            <div class="relative bg-gray-100 overflow-hidden aspect-[4/5] mb-4">
-                                {% if product.images.first %}
-                                    <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500 ease-in-out">
-                                {% else %}
-                                    <div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 uppercase text-xs font-bold tracking-widest">Image indisponible</div>
-                                {% endif %}
-                                <div class="absolute inset-x-0 bottom-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-black/50 to-transparent">
-                                    <button class="w-full bg-white text-brand-900 font-bold uppercase py-3 text-sm tracking-widest hover:bg-gray-100 transition">Voir le produit</button>
-                                </div>
-                            </div>
-                        </a>
-                        
-                        <!-- Wishlist Heart Overlay -->
-                        <div class="absolute top-2 right-2 z-10">
-                            {% if user.is_authenticated %}
-                                <form action="{% url 'users:toggle_wishlist' product.id %}" method="post">
-                                    {% csrf_token %}
-                                    <button type="submit" class="bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-sm text-gray-400 hover:text-red-500 hover:scale-110 transition {% if product in user.wishlist.all %}text-red-500 fill-current{% endif %}">
-                                        <svg class="w-4 h-4 {% if product in user.wishlist.all %}fill-current{% else %}fill-none{% endif %}" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                    </button>
-                                </form>
-                            {% else %}
-                                <a href="{% url 'users:login' %}?next={{ request.path }}" class="block bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-sm text-gray-400 hover:text-red-500 hover:scale-110 transition">
-                                    <svg class="w-4 h-4 fill-none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                </a>
-                            {% endif %}
-                        </div>
-
-                        <a href="{% url 'products:product_detail' product.slug %}" class="block mt-2">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="text-sm font-bold uppercase text-brand-900 mb-1">{{ product.name }}</h3>
-                                    <div class="flex items-center mb-1">
-                                        <div class="flex items-center">
-                                            {% for i in "12345" %}
-                                                <svg class="h-3 w-3 flex-shrink-0 {% if forloop.counter <= product.get_average_rating %}text-yellow-400 fill-current{% else %}text-gray-300 fill-current{% endif %}" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                            {% endfor %}
-                                        </div>
-                                        <span class="ml-1 text-[10px] text-gray-400">({{ product.get_review_count }})</span>
-                                    </div>
-                                    <p class="text-xs text-gray-500 uppercase">{{ product.category.name }}</p>
-                                </div>
-                                <span class="text-sm font-bold text-brand-900">{{ product.base_price }} MAD</span>
-                            </div>
-                        </a>
-                    </div>
-                    {% empty %}
-                    <div class="col-span-full py-20 text-center">
-                        <p class="text-gray-500 text-lg uppercase tracking-wider">Aucun produit trouvé.</p>
-                    </div>
-                    {% endfor %}
+                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-10 gap-x-6 xl:gap-x-8">
+                    {% include 'products/includes/product_list_items.html' %}
                 </div>
 
-                <!-- Pagination -->
-                {% if page_obj.has_other_pages %}
-                <div class="mt-12 flex justify-center space-x-2">
-                    {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" class="px-4 py-2 border border-gray-300 text-sm font-bold text-gray-500 hover:bg-gray-50 transition uppercase tracking-wider">Précédent</a>
-                    {% endif %}
-                    
-                    <span class="px-4 py-2 bg-brand-900 text-white text-sm font-bold border border-brand-900">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
-                    
+                <!-- Load More -->
+                <div class="mt-16 flex justify-center">
                     {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}" class="px-4 py-2 border border-gray-300 text-sm font-bold text-gray-500 hover:bg-gray-50 transition uppercase tracking-wider">Suivant</a>
+                        <button id="load-more-btn" data-next-page="{{ page_obj.next_page_number }}" class="px-12 py-4 bg-brand-900 text-white text-xs font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl flex items-center group">
+                            <span>Charger plus</span>
+                            <svg class="w-4 h-4 ml-2 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
                     {% endif %}
+                    
+                    <div id="loading-spinner" class="hidden">
+                        <svg class="animate-spin h-8 w-8 text-brand-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
                 </div>
-                {% endif %}
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const loadMoreBtn = document.getElementById('load-more-btn');
+                        const productGrid = document.getElementById('product-grid');
+                        const loadingSpinner = document.getElementById('loading-spinner');
+                        
+                        if (loadMoreBtn) {
+                            loadMoreBtn.addEventListener('click', async () => {
+                                const nextPage = loadMoreBtn.getAttribute('data-next-page');
+                                if (!nextPage) return;
+
+                                // Show spinner, hide button
+                                loadMoreBtn.classList.add('hidden');
+                                loadingSpinner.classList.remove('hidden');
+
+                                try {
+                                    // Construct current URL with new page parameter
+                                    const url = new URL(window.location.href);
+                                    url.searchParams.set('page', nextPage);
+                                    url.searchParams.set('page_only', '1');
+
+                                    const response = await fetch(url);
+                                    const html = await response.text();
+
+                                    if (html.trim()) {
+                                        // Append new items
+                                        productGrid.insertAdjacentHTML('beforeend', html);
+                                        
+                                        // Update button for next page
+                                        const nextNextPage = parseInt(nextPage) + 1;
+                                        // We need to know if there's a next page. 
+                                        // A simple way is to check if we got a full page of items (12)
+                                        // but a better way is to check the last item's data-page if we had added it.
+                                        // For now, let's just increment and let the server return empty if done.
+                                        
+                                        loadMoreBtn.setAttribute('data-next-page', nextNextPage);
+                                        
+                                        // If the server returned less than 12 items, we probably reached the end
+                                        // This is a heuristic. A better way would be a JSON response with 'has_next'
+                                        const tempDiv = document.createElement('div');
+                                        tempDiv.innerHTML = html;
+                                        const itemsCount = tempDiv.querySelectorAll('.product-item').length;
+                                        
+                                        if (itemsCount < 12) {
+                                            loadMoreBtn.remove();
+                                        } else {
+                                            loadMoreBtn.classList.remove('hidden');
+                                        }
+                                    } else {
+                                        loadMoreBtn.remove();
+                                    }
+                                } catch (error) {
+                                    console.error('Error loading more products:', error);
+                                    loadMoreBtn.classList.remove('hidden');
+                                } finally {
+                                    loadingSpinner.classList.add('hidden');
+                                }
+                            });
+                        }
+                    });
+                </script>
             </div>
         </div>
     </div>

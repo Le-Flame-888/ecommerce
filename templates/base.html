@@ -136,12 +136,78 @@
                     </div>
                     
                     <!-- Search Form -->
-                    <form action="{% url 'products:product_list' %}" method="get" class="hidden md:flex items-center relative">
-                        <input type="text" name="q" placeholder="{% trans "Rechercher..." %}" class="w-32 lg:w-48 text-sm border-b border-gray-300 focus:border-brand-900 outline-none bg-transparent px-2 py-1 placeholder-gray-400 transition-all !border-x-0 !border-t-0 !px-0">
+                    <form action="{% url 'products:product_list' %}" method="get" class="hidden md:flex items-center relative" id="search-form">
+                        <input type="text" id="search-input" name="q" autocomplete="off" placeholder="{% trans "Rechercher..." %}" class="w-32 lg:w-48 text-sm border-b border-gray-300 focus:border-brand-900 outline-none bg-transparent px-2 py-1 placeholder-gray-400 transition-all !border-x-0 !border-t-0 !px-0">
                         <button type="submit" class="absolute right-0 text-gray-900 hover:text-gray-600 transition">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </button>
+                        <!-- Search Results Dropdown -->
+                        <div id="search-results" class="absolute top-full right-0 w-80 bg-white border border-gray-100 shadow-2xl mt-2 hidden z-[100] divide-y divide-gray-50">
+                            <!-- Results will be injected here -->
+                        </div>
                     </form>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', () => {
+                            const searchInput = document.getElementById('search-input');
+                            const searchResults = document.getElementById('search-results');
+                            let debounceTimer;
+
+                            const performSearch = async (query) => {
+                                if (query.length < 2) {
+                                    searchResults.innerHTML = '';
+                                    searchResults.classList.add('hidden');
+                                    return;
+                                }
+
+                                try {
+                                    const response = await fetch(`/products/search-autocomplete/?q=${encodeURIComponent(query)}`);
+                                    const data = await response.json();
+                                    
+                                    if (data.results.length > 0) {
+                                        searchResults.innerHTML = data.results.map(item => `
+                                            <a href="${item.url}" class="flex items-center p-3 hover:bg-brand-50 transition group">
+                                                <div class="w-12 h-16 bg-gray-100 flex-shrink-0 overflow-hidden">
+                                                    ${item.image ? `<img src="${item.image}" class="w-full h-full object-cover">` : '<div class="w-full h-full flex items-center justify-center text-[10px] text-gray-400">IMG</div>'}
+                                                </div>
+                                                <div class="ml-3 overflow-hidden">
+                                                    <p class="text-xs font-bold uppercase text-brand-900 truncate group-hover:text-black">${item.name}</p>
+                                                    <p class="text-[10px] text-gray-400 uppercase tracking-wider">${item.category}</p>
+                                                    <p class="text-xs font-bold text-brand-900 mt-1">${item.price} MAD</p>
+                                                </div>
+                                            </a>
+                                        `).join('');
+                                        
+                                        // Add "View All" link
+                                        searchResults.innerHTML += `
+                                            <a href="/products/?q=${encodeURIComponent(query)}" class="block p-3 text-center text-[10px] font-black uppercase tracking-widest text-brand-900 hover:bg-gray-100 bg-gray-50 transition">
+                                                Voir tous les résultats
+                                            </a>
+                                        `;
+                                        
+                                        searchResults.classList.remove('hidden');
+                                    } else {
+                                        searchResults.innerHTML = '<div class="p-4 text-xs text-gray-400 text-center uppercase tracking-widest">Aucun résultat</div>';
+                                        searchResults.classList.remove('hidden');
+                                    }
+                                } catch (error) {
+                                    console.error('Search error:', error);
+                                }
+                            };
+
+                            searchInput.addEventListener('input', (e) => {
+                                clearTimeout(debounceTimer);
+                                debounceTimer = setTimeout(() => performSearch(e.target.value), 300);
+                            });
+
+                            // Close dropdown when clicking outside
+                            document.addEventListener('click', (e) => {
+                                if (!document.getElementById('search-form').contains(e.target)) {
+                                    searchResults.classList.add('hidden');
+                                }
+                            });
+                        });
+                    </script>
 
                     <!-- Wishlist Icon -->
                     <a href="{% if user.is_authenticated %}{% url 'users:wishlist' %}{% else %}{% url 'users:login' %}{% endif %}" class="text-gray-900 hover:text-gray-600 transition relative">

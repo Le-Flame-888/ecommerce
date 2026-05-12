@@ -57,8 +57,8 @@ def product_list(request):
     paginator = Paginator(products, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-        
-    return render(request, 'products/product_list.html', {
+    
+    context = {
         'products': page_obj,
         'page_obj': page_obj,
         'categories': categories,
@@ -69,13 +69,55 @@ def product_list(request):
         'max_price': max_price,
         'current_color': color,
         'current_size': size,
-    })
+    }
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('page_only'):
+        return render(request, 'products/includes/product_list_items.html', context)
+        
+    return render(request, 'products/product_list.html', context)
+
+from django.http import JsonResponse
+
+def search_autocomplete(request):
+    query = request.GET.get('q', '')
+    if len(query) < 2:
+        return JsonResponse({'results': []})
+    
+    products = Product.objects.filter(
+        Q(name__icontains=query) | Q(description__icontains=query),
+        is_active=True
+    ).prefetch_related('images')[:5]
+    
+    results = []
+    for product in products:
+        image_url = ''
+        if product.images.first():
+            image_url = product.images.first().image.url
+            
+        results.append({
+            'name': product.name,
+            'price': str(product.base_price),
+            'url': product.get_absolute_url(),
+            'image': image_url,
+            'category': product.category.name
+        })
+        
+    return JsonResponse({'results': results})
 
 from django.contrib import messages
 from .forms import ReviewForm
 
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
+    
+    # Track Recently Viewed Products
+    recently_viewed = request.session.get('recently_viewed', [])
+    if product.id in recently_viewed:
+        recently_viewed.remove(product.id)
+    recently_viewed.insert(0, product.id)
+    request.session['recently_viewed'] = recently_viewed[:10] # Keep last 10
+    request.session.modified = True
+
     related_products = Product.objects.filter(
         category=product.category, is_active=True
     ).exclude(id=product.id).prefetch_related('images')[:4]
