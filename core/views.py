@@ -11,7 +11,8 @@ from django.utils.translation import gettext as _
 
 def home(request):
     featured_products = Product.objects.filter(is_active=True).order_by('-id')[:8]
-    categories = Category.objects.all()[:4]
+    # Fetch all top-level categories
+    categories = Category.objects.filter(parent=None).prefetch_related('subcategories')
     return render(request, 'core/home.html', {
         'featured_products': featured_products,
         'categories': categories

@@ -264,7 +264,7 @@
                         <a href="{% url 'products:product_detail' rp.slug %}" class="group">
                             <div class="aspect-[4/5] bg-gray-100 overflow-hidden mb-3">
                                 {% if rp.images.first %}
-                                <img src="{{ rp.images.first.image.url }}" alt="{{ rp.name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                <img src="{{ rp.images.first.thumbnail.url }}" alt="{{ rp.name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                                 {% else %}
                                 <div class="w-full h-full flex items-center justify-center text-gray-400 text-xs uppercase">Image</div>
                                 {% endif %}

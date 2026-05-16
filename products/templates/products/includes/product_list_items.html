@@ -3,7 +3,7 @@
     <a href="{% url 'products:product_detail' product.slug %}" class="block">
         <div class="relative bg-gray-100 overflow-hidden aspect-[4/5] mb-4">
             {% if product.images.first %}
-                <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500 ease-in-out">
+                <img src="{{ product.images.first.thumbnail.url }}" alt="{{ product.name }}" class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500 ease-in-out">
             {% else %}
                 <div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 uppercase text-xs font-bold tracking-widest">Image indisponible</div>
             {% endif %}

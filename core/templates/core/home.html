@@ -51,38 +51,61 @@
     </div>
 </section>
 
-<!-- Shop by Category (Adidas Style Grid) -->
+<!-- Brand Values -->
+<section class="py-12 bg-white border-b border-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="text-center group">
+                <div class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-brand-50 group-hover:bg-brand-900 group-hover:text-white transition-colors duration-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                </div>
+                <h4 class="text-xs font-black uppercase tracking-widest mb-2">{% trans "Qualité Premium" %}</h4>
+                <p class="text-[11px] text-gray-500 uppercase font-medium leading-relaxed px-4">{% trans "Des matériaux sélectionnés avec soin pour une durabilité exceptionnelle." %}</p>
+            </div>
+            <div class="text-center group">
+                <div class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-brand-50 group-hover:bg-brand-900 group-hover:text-white transition-colors duration-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 00-7 7 7 7 0 007 7 7 7 0 007-7 7 7 0 00-7-7z"></path></svg>
+                </div>
+                <h4 class="text-xs font-black uppercase tracking-widest mb-2">{% trans "Design Durable" %}</h4>
+                <p class="text-[11px] text-gray-500 uppercase font-medium leading-relaxed px-4">{% trans "Une approche minimaliste et intemporelle du luxe moderne." %}</p>
+            </div>
+            <div class="text-center group">
+                <div class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-brand-50 group-hover:bg-brand-900 group-hover:text-white transition-colors duration-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </div>
+                <h4 class="text-xs font-black uppercase tracking-widest mb-2">{% trans "Conception Locale" %}</h4>
+                <p class="text-[11px] text-gray-500 uppercase font-medium leading-relaxed px-4">{% trans "Fier de nos racines, conçu avec passion à Casablanca." %}</p>
+            </div>
+            <div class="text-center group">
+                <div class="w-12 h-12 mx-auto mb-4 flex items-center justify-center bg-brand-50 group-hover:bg-brand-900 group-hover:text-white transition-colors duration-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                </div>
+                <h4 class="text-xs font-black uppercase tracking-widest mb-2">{% trans "Paiement Sécurisé" %}</h4>
+                <p class="text-[11px] text-gray-500 uppercase font-medium leading-relaxed px-4">{% trans "Transactions cryptées et option de paiement à la livraison." %}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Shop by Category (Dynamic Grid) -->
 <section class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="text-4xl font-black text-brand-900 uppercase tracking-tighter mb-12 italic">{% trans "PARCOURIR PAR CATÉGORIE" %}</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Men Tile -->
-            <a href="/products/?category=hommes" class="group relative aspect-[3/4] overflow-hidden bg-gray-100">
-                <img src="{% static 'images/sneaker.png' %}" alt="{% trans "Hommes" %}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-{{ categories.count|default:3 }} gap-6">
+            {% for cat in categories %}
+            <a href="{{ cat.get_absolute_url }}" class="group relative aspect-[3/4] overflow-hidden bg-gray-100">
+                {% if cat.image %}
+                    <img src="{{ cat.image.url }}" alt="{{ cat.name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+                {% else %}
+                    <div class="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 font-black text-4xl italic tracking-tighter opacity-20">LUXE.</div>
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
                 <div class="absolute bottom-10 left-10">
-                    <h3 class="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">{% trans "HOMMES" %}</h3>
-                    <span class="inline-block bg-white text-brand-900 font-bold uppercase py-3 px-8 text-xs tracking-widest group-hover:bg-brand-900 group-hover:text-white transition">{% trans "DÉCOUVRIR" %}</span>
+                    <h3 class="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">{{ cat.name }}</h3>
+                    <span class="inline-block bg-white text-brand-900 font-bold uppercase py-3 px-8 text-xs tracking-widest group-hover:bg-brand-900 group-hover:text-white transition-all duration-300">{% trans "DÉCOUVRIR" %}</span>
                 </div>
             </a>
-            <!-- Women Tile -->
-            <a href="/products/?category=femmes" class="group relative aspect-[3/4] overflow-hidden bg-gray-100">
-                <img src="{% static 'images/hero.png' %}" alt="{% trans "Femmes" %}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                <div class="absolute bottom-10 left-10">
-                    <h3 class="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">{% trans "FEMMES" %}</h3>
-                    <span class="inline-block bg-white text-brand-900 font-bold uppercase py-3 px-8 text-xs tracking-widest group-hover:bg-brand-900 group-hover:text-white transition">{% trans "DÉCOUVRIR" %}</span>
-                </div>
-            </a>
-            <!-- Accessories Tile -->
-            <a href="/products/?category=accessoires" class="group relative aspect-[3/4] overflow-hidden bg-gray-100">
-                <img src="{% static 'images/tshirt.png' %}" alt="{% trans "Accessoires" %}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                <div class="absolute bottom-10 left-10">
-                    <h3 class="text-3xl font-black text-white uppercase italic tracking-tighter mb-4">{% trans "ACCESSOIRES" %}</h3>
-                    <span class="inline-block bg-white text-brand-900 font-bold uppercase py-3 px-8 text-xs tracking-widest group-hover:bg-brand-900 group-hover:text-white transition">{% trans "DÉCOUVRIR" %}</span>
-                </div>
-            </a>
+            {% endfor %}
         </div>
     </div>
 </section>

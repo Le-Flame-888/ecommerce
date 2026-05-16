@@ -57,8 +57,10 @@ INSTALLED_APPS = [
     'orders',
     'coupons',
     'widget_tweaks',
+    'imagekit',
 
     # Allauth
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',

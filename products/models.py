@@ -2,12 +2,27 @@ from django.db import models
 from django.utils.text import slugify
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from imagekit.models import ProcessedImageField, ImageSpecField
+from imagekit.processors import ResizeToFill, ResizeToFit
 
 class Category(models.Model):
     name = models.CharField(_('name'), max_length=100)
     slug = models.SlugField(unique=True, blank=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subcategories', verbose_name=_('parent category'))
-    image = models.ImageField(_('image'), upload_to='categories/', null=True, blank=True)
+    image = ProcessedImageField(
+        verbose_name=_('image'),
+        upload_to='categories/',
+        processors=[ResizeToFit(1200, 1200)],
+        format='WEBP',
+        options={'quality': 85},
+        null=True, blank=True
+    )
+    thumbnail = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(400, 400)],
+        format='WEBP',
+        options={'quality': 80}
+    )
 
     class Meta:
         verbose_name = _('category')
@@ -82,7 +97,19 @@ class ProductVariant(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images', verbose_name=_('product'))
-    image = models.ImageField(_('image'), upload_to='products/')
+    image = ProcessedImageField(
+        verbose_name=_('image'),
+        upload_to='products/',
+        processors=[ResizeToFit(1600, 1600)],
+        format='WEBP',
+        options={'quality': 85}
+    )
+    thumbnail = ImageSpecField(
+        source='image',
+        processors=[ResizeToFill(600, 750)],
+        format='WEBP',
+        options={'quality': 80}
+    )
     alt_text = models.CharField(_('alt text'), max_length=255, blank=True, null=True)
     is_main = models.BooleanField(_('is main'), default=False)
 
@@ -105,7 +132,7 @@ class Review(models.Model):
         verbose_name = _('review')
         verbose_name_plural = _('reviews')
         ordering = ['-created_at']
-        unique_together = ('product', 'user') # One review per user per product
+        unique_together = ('product', 'user')
 
     def __str__(self):
         return f"Review by {self.user.username} for {self.product.name}"
